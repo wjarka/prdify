@@ -1,94 +1,102 @@
-# 10x Astro Starter
+# PRDify
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+PRDify is a web application designed to streamline the process of creating Product Requirement Documents (PRDs) according to the 10xDevs methodology. It guides users through a structured, three-step process: from an AI-powered planning session, through an automatically generated summary, to a complete PRD.
 
-## Tech Stack
+## 📖 Table of Contents
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- [Project Description](#-project-description)
+- [✨ Tech Stack](#-tech-stack)
+- [🚀 Getting Started Locally](#-getting-started-locally)
+- [📜 Available Scripts](#-available-scripts)
+- [🎯 Project Scope](#-project-scope)
+- [📊 Project Status](#-project-status)
+- [📄 License](#-license)
 
-## Prerequisites
+## ✍️ Project Description
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+The current process of creating PRDs is often laborious and fragmented. Users have to manually manage multiple steps, copy-paste content between different tools, and search for the right prompts. This workflow is inefficient, prone to errors, and distracts from the core task of refining product requirements.
 
-## Getting Started
+PRDify solves this by providing a seamless, integrated experience. It's built for developers and product managers who want to efficiently transform an initial concept into a ready-to-implement document, minimizing friction and ensuring consistency.
 
-1. Clone the repository:
+## ✨ Tech Stack
 
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
+The project uses a modern tech stack to deliver a fast and interactive user experience.
 
-2. Install dependencies:
+| Category  | Technology                                                                                                  |
+| :-------- | :---------------------------------------------------------------------------------------------------------- |
+| Frontend  | [Astro 5](https://astro.build/), [React 19](https://react.dev/), [TypeScript 5](https://www.typescriptlang.org/), [Tailwind CSS 4](https://tailwindcss.com/), [Shadcn/ui](https://ui.shadcn.com/) |
+| Backend   | [Supabase](https://supabase.com/) (PostgreSQL, Authentication, BaaS)                                        |
+| AI        | [OpenRouter.ai](https://openrouter.ai/) (Access to various LLMs like OpenAI, Anthropic, Google)             |
+| DevOps    | [GitHub Actions](https://github.com/features/actions) (CI/CD), [Docker](https://www.docker.com/) for hosting |
 
-```bash
-npm install
-```
+## 🚀 Getting Started Locally
 
-3. Run the development server:
+To run the project on your local machine, follow these steps.
 
-```bash
-npm run dev
-```
+### Prerequisites
 
-4. Build for production:
+- **Node.js**: Version `22.14.0`. We recommend using [nvm](https://github.com/nvm-sh/nvm) to manage Node versions (`nvm use`).
+- **npm**: Should be installed with Node.js.
+- **Supabase Account**: You'll need a Supabase project for the database and authentication.
 
-```bash
-npm run build
-```
+### Installation
 
-## Available Scripts
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/wjarka/prdify.git
+    cd prdify
+    ```
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-## Project Structure
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project by copying the example file:
+    ```bash
+    cp .env.example .env
+    ```
+    Then, fill in your Supabase project URL and Anon Key in the `.env` file:
+    ```
+    PUBLIC_SUPABASE_URL="your-supabase-project-url"
+    PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+    ```
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-## AI Development Support
+The application should now be running at `http://localhost:4321`.
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+## 📜 Available Scripts
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+In the project directory, you can run the following commands:
 
-### Cursor IDE
+- `npm run dev`: Runs the app in development mode.
+- `npm run build`: Builds the app for production.
+- `npm run preview`: Starts a local server to preview the production build.
+- `npm run lint`: Lints the code using ESLint.
+- `npm run lint:fix`: Automatically fixes linting issues.
+- `npm run format`: Formats the code using Prettier.
 
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
+## 🎯 Project Scope
 
-### GitHub Copilot
+### In Scope (MVP Features)
 
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
+- **User Authentication**: Secure user registration and login.
+- **Project Management**: Create, view, resume, and delete projects.
+- **Step 1: AI Planning Session**: A guided, multi-round Q&A with an AI to define project requirements.
+- **Step 2: AI Summary Generation**: Automatically generate an editable summary from the planning session.
+- **Step 3: AI PRD Generation**: Automatically generate a full, editable PRD from the approved summary.
+- **Markdown Export**: Export the final PRD to a `prd.md` file.
+- **State Persistence**: Application state is saved after each major user action.
 
-### Windsurf
+## 📊 Project Status
 
-The `.windsurfrules` file contains AI configuration for Windsurf.
+This project is currently in the **initial development phase**. The core features are being built as per the MVP scope.
 
-## Contributing
+## 📄 License
 
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
-
-## License
-
-MIT
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
