@@ -3,9 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
-# AI Rules for {app-name}
+# AI Rules for PRDify
 
-{project-description}
+PRDify to aplikacja internetowa zaprojektowana w celu usprawnienia procesu tworzenia dokumentów wymagań produktowych (PRD) zgodnie z metodologią 10xDevs. Aplikacja prowadzi użytkownika przez trzyetapowy, ustrukturyzowany proces: od sesji planistycznej z AI, przez automatyczne generowanie podsumowania aż do pełnego PRD. Celem produktu jest zminimalizowanie tarcia w przepływie pracy, eliminując potrzebę ręcznego kopiowania treści i zarządzania promptami, co pozwala na szybsze i bardziej spójne tworzenie dokumentacji. Grupą docelową są programiści i menedżerowie produktu, którzy chcą efektywnie przekształcić początkową koncepcję w gotowy do implementacji dokument.
 
 ## Tech Stack
 
