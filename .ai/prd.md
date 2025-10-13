@@ -11,8 +11,8 @@ Obecny proces tworzenia PRD według metodologii 10xDevs jest pracochłonny i fra
 ## 3. Wymagania funkcjonalne
 
 - F-001: System uwierzytelniania użytkowników oparty na adresie e-mail i haśle (rejestracja i logowanie).
-- F-002: Zarządzanie projektami: tworzenie, przeglądanie, wznawianie pracy i usuwanie projektów.
-- F-003: Inicjalizacja projektu poprzez formularz definiujący: Główny problem, Zakres MVP, Poza zakresem MVP, Kryteria sukcesu.
+- F-002: Zarządzanie PRD: tworzenie, przeglądanie, wznawianie pracy i usuwanie PRD.
+- F-003: Inicjalizacja PRD poprzez formularz definiujący: Główny problem, W zakresie, Poza zakresem, Kryteria sukcesu.
 - F-004: Krok 1: Prowadzona sesja planistyczna w formie dynamicznego formularza, gdzie AI zadaje pytania, a użytkownik udziela odpowiedzi w polach tekstowych. Proces jest wielorundowy.
 - F-005: Krok 2: Automatyczne generowanie edytowalnego podsumowania sesji planistycznej na podstawie wszystkich rund pytań i odpowiedzi.
 - F-006: Możliwość powrotu z etapu podsumowania do etapu planowania w celu przeprowadzenia dodatkowych rund Q&A.
@@ -27,10 +27,10 @@ Obecny proces tworzenia PRD według metodologii 10xDevs jest pracochłonny i fra
 
 Następujące funkcje nie wchodzą w zakres wersji MVP:
 
-- Współpraca wielu użytkowników nad jednym projektem.
+- Współpraca wielu użytkowników nad jednym PRD.
 - Wersjonowanie i historia zmian w dokumentach PRD.
 - Możliwość dodawania własnych, niestandardowych promptów.
-- Szablony dla różnych typów projektów.
+- Szablony dla różnych typów PRD.
 - Integracje z zewnętrznymi narzędziami (np. GitHub, Linear, Jira).
 - Automatyczne generowanie diagramów lub innych wizualizacji.
 - Integracje z agentami AI (MCP).
@@ -49,48 +49,48 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
 
 - ID: US-002
 - Tytuł: Logowanie użytkownika
-- Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się do aplikacji przy użyciu mojego adresu e-mail i hasła, aby uzyskać dostęp do moich projektów.
+- Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się do aplikacji przy użyciu mojego adresu e-mail i hasła, aby uzyskać dostęp do moich PRD.
 - Kryteria akceptacji:
   - Formularz logowania zawiera pola na e-mail i hasło.
   - W przypadku podania błędnych danych, wyświetlany jest stosowny komunikat.
-  - Po pomyślnym zalogowaniu użytkownik jest przekierowany do panelu z listą swoich projektów.
+  - Po pomyślnym zalogowaniu użytkownik jest przekierowany do panelu z listą swoich PRD.
 
 - ID: US-003
-- Tytuł: Tworzenie nowego projektu
-- Opis: Jako zalogowany użytkownik, chcę móc rozpocząć nowy projekt, wypełniając początkowy formularz z czterema kluczowymi polami (problem, zakres MVP, poza zakresem, kryteria sukcesu), aby zainicjować proces tworzenia PRD.
+- Tytuł: Tworzenie nowego PRD
+- Opis: Jako zalogowany użytkownik, chcę móc rozpocząć nowy PRD, wypełniając początkowy formularz z nazwą PRD i czterema kluczowymi polami (problem, w zakresie, poza zakresem, kryteria sukcesu), aby zainicjować proces tworzenia dokumentu.
 - Kryteria akceptacji:
-  - Na pulpicie głównym znajduje się przycisk "Utwórz nowy projekt".
-  - Formularz zawiera cztery wymagane pola tekstowe.
+  - Na pulpicie głównym znajduje się przycisk "Utwórz nowy PRD".
+  - Formularz zawiera pięć wymaganych pól tekstowych.
   - Przesłanie formularza jest niemożliwe, jeśli którekolwiek pole jest puste.
   - Po przesłaniu formularza, proces zostaje uznany za "rozpoczęty" na potrzeby metryk, a użytkownik jest przenoszony do Kroku 1 (Sesja planistyczna).
 
 - ID: US-004
-- Tytuł: Przeglądanie listy projektów
-- Opis: Jako zalogowany użytkownik, chcę widzieć listę wszystkich moich projektów na pulpicie głównym, aby móc szybko wybrać, nad którym chcę pracować.
+- Tytuł: Przeglądanie listy PRD
+- Opis: Jako zalogowany użytkownik, chcę widzieć listę wszystkich moich PRD na pulpicie głównym, aby móc szybko wybrać, nad którym chcę pracować.
 - Kryteria akceptacji:
-  - Pulpit główny wyświetla listę projektów użytkownika.
-  - Każdy element listy zawiera nazwę projektu i wskazanie ostatniego etapu, na którym zakończono pracę.
+  - Pulpit główny wyświetla listę PRD użytkownika.
+  - Każdy element listy zawiera nazwę PRD i wskazanie ostatniego etapu, na którym zakończono pracę.
 
 - ID: US-005
-- Tytuł: Usuwanie projektu
-- Opis: Jako użytkownik, chcę mieć możliwość usunięcia projektu, którego już nie potrzebuję, aby utrzymać porządek na liście projektów.
+- Tytuł: Usuwanie PRD
+- Opis: Jako użytkownik, chcę mieć możliwość usunięcia PRD, którego już nie potrzebuję, aby utrzymać porządek na liście.
 - Kryteria akceptacji:
-  - Na liście projektów przy każdym z nich znajduje się opcja "Usuń".
+  - Na liście PRD przy każdym z nich znajduje się opcja "Usuń".
   - Przed usunięciem system prosi o potwierdzenie operacji.
-  - Po potwierdzeniu projekt jest trwale usuwany z bazy danych i znika z listy.
+  - Po potwierdzeniu PRD jest trwale usuwany z bazy danych i znika z listy.
 
 - ID: US-006
-- Tytuł: Wznawianie pracy nad projektem
-- Opis: Jako użytkownik, chcę móc wznowić pracę nad istniejącym projektem, klikając na niego na liście, aby kontynuować od ostatniego zapisanego etapu.
+- Tytuł: Wznawianie pracy nad PRD
+- Opis: Jako użytkownik, chcę móc wznowić pracę nad istniejącym PRD, klikając na niego na liście, aby kontynuować od ostatniego zapisanego etapu.
 - Kryteria akceptacji:
-  - Kliknięcie projektu na liście (lub przycisku "Wznów"/"Edytuj") przenosi użytkownika do ostatniego etapu, na którym pracował (np. edycja PRD).
-  - Wszystkie wcześniej wygenerowane i zapisane dane dla tego projektu są wczytywane.
+  - Kliknięcie PRD na liście (lub przycisku "Wznów"/"Edytuj") przenosi użytkownika do ostatniego etapu, na którym pracował (np. edycja dokumentu).
+  - Wszystkie wcześniej wygenerowane i zapisane dane dla tego PRD są wczytywane.
 
 - ID: US-007
 - Tytuł: Przeprowadzanie sesji planistycznej (Krok 1)
-- Opis: Jako użytkownik, chcę przejść przez wielorundową sesję pytań i odpowiedzi z AI, aby szczegółowo zdefiniować wymagania mojego projektu.
+- Opis: Jako użytkownik, chcę przejść przez wielorundową sesję pytań i odpowiedzi z AI, aby szczegółowo zdefiniować wymagania mojego PRD.
 - Kryteria akceptacji:
-  - Po utworzeniu projektu system prezentuje pierwszą rundę pytań od AI w formie formularza.
+  - Po utworzeniu PRD system prezentuje pierwszą rundę pytań od AI w formie formularza.
   - Użytkownik wypełnia pola odpowiedzi i przesyła je.
   - Po każdej rundzie użytkownik ma do wyboru opcje: "Kontynuuj planowanie" (następna runda Q&A) lub "Wygeneruj podsumowanie".
   - Po 5 rundach system może wyświetlić sugestię przejścia do następnego etapu.
@@ -162,5 +162,5 @@ Głównym wskaźnikiem sukcesu dla wersji MVP jest wydajność i płynność prz
 
 - Główny wskaźnik: 80% rozpoczętych procesów kończy się kompletnym PRD (przejście przez wszystkie 3 kroki).
 - Sposób pomiaru:
-  - "Proces rozpoczęty" jest liczony jako zdarzenie, w którym użytkownik pomyślnie prześle formularz definicji nowego projektu (wypełnione 4 pola).
-  - "Proces ukończony" jest liczony jako zdarzenie, w którym użytkownik pomyślnie wygeneruje PRD w Kroku 3.
+  - "Proces rozpoczęty" jest liczony jako zdarzenie, w którym użytkownik pomyślnie prześle formularz definicji nowego PRD (wypełnione 4 pola).
+  - "Proces ukończony" jest liczony jako zdarzenie, w którym użytkownik pomyślnie wygeneruje finalny dokument PRD w Kroku 3.
