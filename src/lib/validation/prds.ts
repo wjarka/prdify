@@ -44,3 +44,12 @@ export const createPrdSchema = z.object({
 });
 
 export type CreatePrdSchema = typeof createPrdSchema;
+
+export const getPrdsSchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+  sortBy: z.enum(["name", "status", "createdAt", "updatedAt"]).default("updatedAt"),
+  order: z.enum(["asc", "desc"]).default("desc"),
+});
+
+export type GetPrdsSchema = z.infer<typeof getPrdsSchema>;

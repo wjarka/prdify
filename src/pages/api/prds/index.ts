@@ -1,9 +1,9 @@
 import type { APIContext } from "astro";
 import { ZodError } from "zod";
 
-import { createPrd } from "../../../lib/services/prds";
-import { createPrdSchema } from "../../../lib/validation/prds";
-import type { PrdDto } from "../../../types";
+import { createPrd, getPrds } from "../../../lib/services/prds";
+import { createPrdSchema, getPrdsSchema } from "../../../lib/validation/prds";
+import type { PaginatedPrdsDto, PrdDto } from "../../../types";
 
 export const prerender = false;
 
@@ -14,6 +14,36 @@ function jsonResponse<T>(status: number, body: T) {
       "Content-Type": "application/json",
     },
   });
+}
+
+export async function GET(context: APIContext): Promise<Response> {
+  try {
+    if (!context.locals.user?.id) {
+      return jsonResponse(401, { message: "User not authenticated" });
+    }
+
+    const queryParams = new URL(context.request.url).searchParams;
+    const params = Object.fromEntries(queryParams.entries());
+
+    const validationResult = getPrdsSchema.safeParse(params);
+
+    if (!validationResult.success) {
+      return jsonResponse(400, {
+        message: "Validation failed",
+        details: validationResult.error.flatten(),
+      });
+    }
+
+    const paginatedPrds = await getPrds(context.locals.supabase, context.locals.user.id, validationResult.data);
+
+    return jsonResponse<PaginatedPrdsDto>(200, paginatedPrds);
+  } catch (error) {
+    if (error instanceof Error && error.name === "PrdFetchingError") {
+      return jsonResponse(500, { message: "Failed to fetch PRDs" });
+    }
+
+    return jsonResponse(500, { message: "Internal Server Error" });
+  }
 }
 
 export async function POST(context: APIContext): Promise<Response> {

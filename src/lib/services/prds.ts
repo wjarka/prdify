@@ -1,7 +1,8 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { Prd, PrdDto, CreatePrdCommand } from "../../types";
+import type { Prd, PrdDto, CreatePrdCommand, PaginatedPrdsDto, PrdListItemDto } from "../../types";
+import type { GetPrdsSchema } from "../validation/prds";
 
 const UNIQUE_VIOLATION_CODE = "23505";
 const INITIAL_PRD_STATUS: PrdDto["status"] = "planning";
@@ -17,6 +18,13 @@ export class PrdCreationError extends Error {
   constructor(message = "Unable to create PRD") {
     super(message);
     this.name = "PrdCreationError";
+  }
+}
+
+export class PrdFetchingError extends Error {
+  constructor(message = "Unable to fetch PRDs") {
+    super(message);
+    this.name = "PrdFetchingError";
   }
 }
 
@@ -88,4 +96,72 @@ export async function createPrd(supabase: SupabaseClient, userId: string, comman
   }
 
   return mapPrdRowToDto(supabase, data as Prd);
+}
+
+const SortByMap: Record<GetPrdsSchema["sortBy"], string> = {
+  name: "name",
+  status: "status",
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+};
+
+export async function getPrds(
+  supabase: SupabaseClient,
+  userId: string,
+  options: GetPrdsSchema
+): Promise<PaginatedPrdsDto> {
+  const { page, limit, sortBy, order } = options;
+  const offset = (page - 1) * limit;
+  const sortByColumn = SortByMap[sortBy];
+
+  try {
+    const countQuery = supabase.from("prds").select("*", { count: "exact", head: true }).eq("user_id", userId);
+    const prdsQuery = supabase
+      .from("prds")
+      .select("id, name, status, created_at, updated_at")
+      .eq("user_id", userId)
+      .order(sortByColumn, { ascending: order === "asc" })
+      .range(offset, offset + limit - 1);
+
+    const [{ count, error: countError }, { data: prdsData, error: prdsError }] = await Promise.all([
+      countQuery,
+      prdsQuery,
+    ]);
+
+    if (countError) {
+      throw new PrdFetchingError(countError.message);
+    }
+
+    if (prdsError) {
+      throw new PrdFetchingError(prdsError.message);
+    }
+
+    const totalItems = count ?? 0;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const prds = prdsData?.map(
+      (prd): PrdListItemDto => ({
+        id: prd.id,
+        name: prd.name,
+        status: prd.status,
+        createdAt: prd.created_at,
+        updatedAt: prd.updated_at,
+      })
+    );
+
+    return {
+      data: prds ?? [],
+      pagination: {
+        page,
+        limit,
+        totalItems,
+        totalPages,
+      },
+    };
+  } catch (error) {
+    if (error instanceof PrdFetchingError) {
+      throw error;
+    }
+    throw new PrdFetchingError(error instanceof Error ? error.message : "An unknown error occurred");
+  }
 }
