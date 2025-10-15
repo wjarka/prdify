@@ -59,3 +59,14 @@ export const getPrdByIdSchema = z.object({
 });
 
 export type GetPrdByIdSchema = z.infer<typeof getPrdByIdSchema>;
+
+export const updatePrdSchema = z.object({
+  name: z
+    .string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
+    .trim()
+    .min(1, "Name cannot be empty")
+    .max(NAME_MAX_LENGTH, `Name must be at most ${NAME_MAX_LENGTH} characters long`)
+    .optional(),
+});
+
+export type UpdatePrdSchema = z.infer<typeof updatePrdSchema>;

@@ -1,7 +1,7 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { Prd, PrdDto, CreatePrdCommand, PaginatedPrdsDto, PrdListItemDto } from "../../types";
+import type { Prd, PrdDto, CreatePrdCommand, PaginatedPrdsDto, PrdListItemDto, UpdatePrdCommand } from "../../types";
 import type { GetPrdsSchema } from "../validation/prds";
 
 const UNIQUE_VIOLATION_CODE = "23505";
@@ -26,6 +26,20 @@ export class PrdFetchingError extends Error {
   constructor(message = "Unable to fetch PRDs") {
     super(message);
     this.name = "PrdFetchingError";
+  }
+}
+
+export class PrdUpdateError extends Error {
+  constructor(message = "Unable to update PRD") {
+    super(message);
+    this.name = "PrdUpdateError";
+  }
+}
+
+export class PrdConflictError extends Error {
+  constructor(message = "PRD is completed and cannot be modified") {
+    super(message);
+    this.name = "PrdConflictError";
   }
 }
 
@@ -87,6 +101,14 @@ function handlePostgrestError(error: PostgrestError): never {
   throw new PrdCreationError(error.message);
 }
 
+function handlePrdUpdatePostgrestError(error: PostgrestError): never {
+  if (error.code === UNIQUE_VIOLATION_CODE) {
+    throw new PrdNameConflictError();
+  }
+
+  throw new PrdUpdateError(error.message);
+}
+
 export async function createPrd(supabase: SupabaseClient, userId: string, command: CreatePrdCommand): Promise<PrdDto> {
   const payload = {
     user_id: userId,
@@ -115,6 +137,40 @@ export async function createPrd(supabase: SupabaseClient, userId: string, comman
   } catch (error) {
     if (error instanceof RoundNumberCalculationError) {
       throw new PrdCreationError(error.message);
+    }
+    throw error;
+  }
+}
+
+export async function updatePrd(supabase: SupabaseClient, id: string, command: UpdatePrdCommand): Promise<PrdDto> {
+  const { data: existingPrd, error: fetchError } = await supabase.from("prds").select("*").eq("id", id).single();
+
+  if (fetchError) {
+    if (fetchError.code === POSTGREST_NOT_FOUND_CODE) {
+      throw new PrdNotFoundError();
+    }
+    throw new PrdFetchingError(fetchError.message);
+  }
+
+  if (existingPrd.status === "completed") {
+    throw new PrdConflictError();
+  }
+
+  const { data, error } = await supabase.from("prds").update({ name: command.name }).eq("id", id).select().single();
+
+  if (error) {
+    handlePrdUpdatePostgrestError(error);
+  }
+
+  if (!data) {
+    throw new PrdUpdateError();
+  }
+
+  try {
+    return await mapPrdRowToDto(supabase, data as Prd);
+  } catch (error) {
+    if (error instanceof RoundNumberCalculationError) {
+      throw new PrdUpdateError(error.message);
     }
     throw error;
   }
