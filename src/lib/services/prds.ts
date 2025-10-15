@@ -5,6 +5,7 @@ import type { Prd, PrdDto, CreatePrdCommand, PaginatedPrdsDto, PrdListItemDto } 
 import type { GetPrdsSchema } from "../validation/prds";
 
 const UNIQUE_VIOLATION_CODE = "23505";
+const POSTGREST_NOT_FOUND_CODE = "PGRST116";
 const INITIAL_PRD_STATUS: PrdDto["status"] = "planning";
 
 export class PrdNameConflictError extends Error {
@@ -28,6 +29,20 @@ export class PrdFetchingError extends Error {
   }
 }
 
+export class RoundNumberCalculationError extends Error {
+  constructor(message = "Unable to calculate current round number") {
+    super(message);
+    this.name = "RoundNumberCalculationError";
+  }
+}
+
+export class PrdNotFoundError extends Error {
+  constructor(message = "PRD not found") {
+    super(message);
+    this.name = "PrdNotFoundError";
+  }
+}
+
 async function getCurrentRoundNumber(supabase: SupabaseClient, prdId: string): Promise<number> {
   const { data, error } = await supabase
     .from("prd_questions")
@@ -38,7 +53,7 @@ async function getCurrentRoundNumber(supabase: SupabaseClient, prdId: string): P
     .maybeSingle();
 
   if (error) {
-    throw new PrdCreationError(error.message);
+    throw new RoundNumberCalculationError(error.message);
   }
 
   return data?.round_number ?? 0;
@@ -95,7 +110,34 @@ export async function createPrd(supabase: SupabaseClient, userId: string, comman
     throw new PrdCreationError();
   }
 
-  return mapPrdRowToDto(supabase, data as Prd);
+  try {
+    return await mapPrdRowToDto(supabase, data as Prd);
+  } catch (error) {
+    if (error instanceof RoundNumberCalculationError) {
+      throw new PrdCreationError(error.message);
+    }
+    throw error;
+  }
+}
+
+export async function getPrdById(supabase: SupabaseClient, id: string): Promise<PrdDto> {
+  const { data, error } = await supabase.from("prds").select("*").eq("id", id).single();
+
+  if (error) {
+    if (error.code === POSTGREST_NOT_FOUND_CODE) {
+      throw new PrdNotFoundError();
+    }
+    throw new PrdFetchingError(error.message);
+  }
+
+  try {
+    return await mapPrdRowToDto(supabase, data as Prd);
+  } catch (error) {
+    if (error instanceof RoundNumberCalculationError) {
+      throw new PrdFetchingError(error.message);
+    }
+    throw error;
+  }
 }
 
 const SortByMap: Record<GetPrdsSchema["sortBy"], string> = {
