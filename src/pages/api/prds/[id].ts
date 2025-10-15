@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getPrdByIdSchema } from "../../../lib/validation/prds";
+import { prdIdSchema } from "../../../lib/validation/prds";
 import {
   getPrdById,
   PrdFetchingError,
@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const result = getPrdByIdSchema.safeParse(params);
+  const result = prdIdSchema.safeParse(params);
   if (!result.success) {
     return new Response(JSON.stringify({ error: "Invalid PRD ID format" }), { status: 400 });
   }
@@ -53,7 +53,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const idValidationResult = getPrdByIdSchema.safeParse(params);
+  const idValidationResult = prdIdSchema.safeParse(params);
   if (!idValidationResult.success) {
     return new Response(JSON.stringify({ error: "Invalid PRD ID format" }), { status: 400 });
   }

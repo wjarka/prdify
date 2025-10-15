@@ -54,11 +54,11 @@ export const getPrdsSchema = z.object({
 
 export type GetPrdsSchema = z.infer<typeof getPrdsSchema>;
 
-export const getPrdByIdSchema = z.object({
+export const prdIdSchema = z.object({
   id: z.string().uuid({ message: "Invalid PRD ID format" }),
 });
 
-export type GetPrdByIdSchema = z.infer<typeof getPrdByIdSchema>;
+export type PrdIdSchema = z.infer<typeof prdIdSchema>;
 
 export const updatePrdSchema = z.object({
   name: z
