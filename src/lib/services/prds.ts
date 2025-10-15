@@ -263,3 +263,15 @@ export async function getPrds(
     throw new PrdFetchingError(error instanceof Error ? error.message : "An unknown error occurred");
   }
 }
+
+export async function deletePrd(supabase: SupabaseClient, id: string): Promise<void> {
+  const { error, count } = await supabase.from("prds").delete({ count: "exact" }).eq("id", id);
+
+  if (error) {
+    throw new PrdFetchingError(error.message);
+  }
+
+  if (count === 0) {
+    throw new PrdNotFoundError();
+  }
+}

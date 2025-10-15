@@ -8,6 +8,7 @@ import {
   PrdUpdateError,
   PrdConflictError,
   PrdNameConflictError,
+  deletePrd,
 } from "../../../lib/services/prds";
 import { updatePrdSchema } from "../../../lib/validation/prds";
 
@@ -117,6 +118,29 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     if (error instanceof PrdUpdateError || error instanceof PrdFetchingError) {
       // TODO: Add logging
       return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
+    }
+
+    // TODO: Add logging
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
+  }
+};
+
+export const DELETE: APIRoute = async ({ params, locals }) => {
+  const { supabase } = locals;
+
+  const validation = prdIdSchema.safeParse(params);
+  if (!validation.success) {
+    return new Response(validation.error.errors[0].message, { status: 400 });
+  }
+
+  const { id } = validation.data;
+
+  try {
+    await deletePrd(supabase, id);
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    if (error instanceof PrdNotFoundError) {
+      return new Response(JSON.stringify({ error: "PRD not found" }), { status: 404 });
     }
 
     // TODO: Add logging
