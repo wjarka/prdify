@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ params, locals }) => {
 
     if (error instanceof PrdQuestionGenerationError) {
       return new Response(JSON.stringify({ error: error.message }), {
-        status: 409,
+        status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
