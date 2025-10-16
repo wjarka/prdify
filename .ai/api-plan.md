@@ -245,36 +245,11 @@
 
 ### PRD Rounds Sub-Resource
 
-#### `GET /api/prds/{id}/rounds/latest`
-
-- **Description**: Retrieve the questions for the most recent round of a specific PRD.
-- **Response (200 OK)**:
-  ```json
-  {
-    "questions": [
-      {
-        "id": "uuid-q-latest",
-        "prdId": "uuid-prd1",
-        "roundNumber": 2,
-        "question": "This is a question from the latest round.",
-        "answer": null,
-        "createdAt": "iso_timestamp"
-      }
-    ]
-  }
-  ```
-- **Error Codes**:
-    - `401 Unauthorized`: User is not authenticated.
-    - `403 Forbidden`: User does not have permission.
-    - `404 Not Found`: PRD with the given ID does not exist or has no rounds yet.
-
----
-
 #### `GET /api/prds/{id}/rounds/{roundNumber}`
 
-- **Description**: Retrieve the questions for a specific round number of a PRD.
+- **Description**: Retrieve the questions for a specific round number of a PRD. The `{roundNumber}` parameter can also be the literal string `latest` to fetch the most recent round.
 - **Path Parameters**:
-    - `roundNumber` (number, required): The round number to retrieve.
+    - `roundNumber` (number | "latest", required): The round number to retrieve, or `latest`.
 - **Response (200 OK)**:
   ```json
   {
@@ -291,7 +266,7 @@
   }
   ```
 - **Error Codes**:
-    - `400 Bad Request`: `roundNumber` is not a valid number.
+    - `400 Bad Request`: `roundNumber` is not a valid number or the string `latest`.
     - `401 Unauthorized`: User is not authenticated.
     - `403 Forbidden`: User does not have permission.
     - `404 Not Found`: PRD or the specified round does not exist.
