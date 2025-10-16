@@ -44,6 +44,7 @@
   }
   ```
 - **Error Codes**:
+  - `400 Bad Request`: Invalid query parameters (e.g., invalid pagination values).
   - `401 Unauthorized`: User is not authenticated.
 
 ---
@@ -107,9 +108,9 @@
   }
   ```
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission to access this PRD.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
 
 ---
 
@@ -124,10 +125,9 @@
   ```
 - **Response (200 OK)**: Returns the updated PRD object.
 - **Error Codes**:
-  - `400 Bad Request`: Validation error (e.g., name is empty or not unique).
+  - `400 Bad Request`: Validation error (e.g., invalid PRD ID format, name is empty or not unique).
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission to update this PRD.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is completed and cannot be modified.
 
 ---
@@ -137,9 +137,9 @@
 - **Description**: Delete a PRD and all its associated data (questions).
 - **Response (204 No Content)**:
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission to delete this PRD.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
 
 ---
 
@@ -149,9 +149,9 @@
 - **Response (200 OK)**:
   - The body of the response is the raw Markdown content of the final PRD.
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission to access this PRD.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `completed` status.
 
 ### PRD Questions Sub-Resource
@@ -184,9 +184,9 @@
   }
   ```
 - **Error Codes**:
+    - `400 Bad Request`: Invalid PRD ID format or invalid query parameters.
     - `401 Unauthorized`: User is not authenticated.
-    - `403 Forbidden`: User does not have permission to access these questions.
-    - `404 Not Found`: PRD with the given ID does not exist.
+    - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
 
 ---
 
@@ -210,10 +210,9 @@
   ```
 - **Response (204 No Content)**:
 - **Error Codes**:
-  - `400 Bad Request`: Validation failed (e.g., `answers` array is empty, `text` is empty).
+  - `400 Bad Request`: Validation failed (e.g., invalid PRD ID format, `answers` array is empty, `text` is empty).
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
-  - `404 Not Found`: A `questionId` provided does not exist.
+  - `404 Not Found`: A `questionId` provided does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `planning` status.
   - `500 Internal Server Error`: AI service failed to generate new questions.
 
@@ -238,8 +237,9 @@
   }
   ```
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `planning` status.
   - `500 Internal Server Error`: AI service failed to generate new questions.
 
@@ -268,8 +268,7 @@
 - **Error Codes**:
     - `400 Bad Request`: `roundNumber` is not a valid number or the string `latest`.
     - `401 Unauthorized`: User is not authenticated.
-    - `403 Forbidden`: User does not have permission.
-    - `404 Not Found`: PRD or the specified round does not exist.
+    - `404 Not Found`: PRD or the specified round does not exist or does not belong to the user.
 
 ### PRD Summary Sub-Resource
 
@@ -283,8 +282,9 @@
   }
   ```
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `planning` status or has no questions.
   - `500 Internal Server Error`: AI service failed to generate the summary.
 
@@ -301,10 +301,9 @@
   ```
 - **Response (200 OK)**: Returns an object with the updated summary.
 - **Error Codes**:
-  - `400 Bad Request`: Validation error (e.g., summary is empty).
+  - `400 Bad Request`: Validation error (e.g., invalid PRD ID format, summary is empty).
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `planning_review` status.
 
 ---
@@ -314,8 +313,9 @@
 - **Description**: Discard the summary and return to the planning phase. This action clears the summary field and transitions the PRD status from `planning_review` back to `planning`.
 - **Response (204 No Content)**:
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `planning_review` status.
 
 ### PRD Document Sub-Resource
@@ -330,8 +330,9 @@
   }
   ```
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `planning_review` status or has no summary.
   - `500 Internal Server Error`: AI service failed to generate the final document.
 
@@ -348,10 +349,9 @@
   ```
 - **Response (200 OK)**: Returns an object with the updated document content.
 - **Error Codes**:
-  - `400 Bad Request`: Validation error (e.g., content is empty).
+  - `400 Bad Request`: Validation error (e.g., invalid PRD ID format, content is empty).
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `prd_review` status.
 
 ---
@@ -361,9 +361,9 @@
 - **Description**: Finalize the PRD. This transitions the PRD status from `prd_review` to `completed`, locking the document from further edits.
 - **Response (200 OK)**: Returns the completed PRD object.
 - **Error Codes**:
+  - `400 Bad Request`: Invalid PRD ID format.
   - `401 Unauthorized`: User is not authenticated.
-  - `403 Forbidden`: User does not have permission.
-  - `404 Not Found`: PRD with the given ID does not exist.
+  - `404 Not Found`: PRD with the given ID does not exist or does not belong to the user.
   - `409 Conflict`: The PRD is not in the `prd_review` status.
 
 ## 3. Authentication and Authorization
