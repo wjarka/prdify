@@ -60,13 +60,18 @@ export const prdIdSchema = z.object({
 
 export type PrdIdSchema = z.infer<typeof prdIdSchema>;
 
-export const updatePrdSchema = z.object({
-  name: z
-    .string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
-    .trim()
-    .min(1, "Name cannot be empty")
-    .max(NAME_MAX_LENGTH, `Name must be at most ${NAME_MAX_LENGTH} characters long`)
-    .optional(),
-});
+export const updatePrdSchema = z
+  .object({
+    name: z
+      .string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
+      .trim()
+      .min(1, "Name cannot be empty")
+      .max(NAME_MAX_LENGTH, `Name must be at most ${NAME_MAX_LENGTH} characters long`)
+      .optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided to update.",
+    path: [], // an empty path makes it a global error
+  });
 
 export type UpdatePrdSchema = z.infer<typeof updatePrdSchema>;

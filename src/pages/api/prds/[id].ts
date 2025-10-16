@@ -65,24 +65,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
     body = await request.json();
   } catch {
-    // If JSON parsing fails or body is empty, treat as empty object
-    body = {};
-  }
-
-  if (Object.keys(body).length === 0) {
-    try {
-      const prd = await getPrdById(supabase, id);
-      return new Response(JSON.stringify(prd), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (error) {
-      if (error instanceof PrdNotFoundError) {
-        return new Response(JSON.stringify({ error: "PRD not found" }), { status: 404 });
-      }
-      // TODO: Add logging
-      return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
-    }
+    return new Response(JSON.stringify({ error: "Invalid or missing request body" }), { status: 400 });
   }
 
   const bodyValidationResult = updatePrdSchema.safeParse(body);
