@@ -57,7 +57,7 @@ export class PrdNotFoundError extends Error {
   }
 }
 
-async function getCurrentRoundNumber(supabase: SupabaseClient, prdId: string): Promise<number> {
+export async function getCurrentRoundNumber(supabase: SupabaseClient, prdId: string): Promise<number> {
   const { data, error } = await supabase
     .from("prd_questions")
     .select("round_number")

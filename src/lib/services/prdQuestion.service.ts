@@ -2,6 +2,7 @@ import type { PostgrestError } from "@supabase/supabase-js";
 
 import type { SupabaseClient } from "../../db/supabase.client";
 import type { PrdQuestion, PrdQuestionDto, PaginatedPrdQuestionsDto, UpdatePrdQuestionsCommand } from "../../types";
+import { getCurrentRoundNumber } from "./prds";
 
 const POSTGREST_NOT_FOUND_CODE = "PGRST116";
 
@@ -37,6 +38,13 @@ export class PrdNotFoundError extends Error {
   constructor(message = "PRD not found") {
     super(message);
     this.name = "PrdNotFoundError";
+  }
+}
+
+export class PrdQuestionGenerationError extends Error {
+  constructor(message = "Cannot generate questions for a non-planning PRD") {
+    super(message);
+    this.name = "PrdQuestionGenerationError";
   }
 }
 
@@ -213,4 +221,64 @@ export async function submitAnswers(
     }
     throw new PrdQuestionUpdateError(error instanceof Error ? error.message : "An unknown error occurred");
   }
+}
+
+/**
+ * Generates the next round of questions for a PRD using AI service
+ * Only allowed when PRD is in planning status
+ */
+export async function generateNextQuestions(supabase: SupabaseClient, prdId: string): Promise<PrdQuestionDto[]> {
+  // First verify the PRD exists and is in planning status
+  const { data: prdData, error: prdError } = await supabase.from("prds").select("id, status").eq("id", prdId).single();
+
+  if (prdError) {
+    if (prdError.code === POSTGREST_NOT_FOUND_CODE) {
+      throw new PrdNotFoundError();
+    }
+    throw new PrdQuestionFetchingError(prdError.message);
+  }
+
+  if (!prdData) {
+    throw new PrdNotFoundError();
+  }
+
+  if (prdData.status !== "planning") {
+    throw new PrdQuestionGenerationError();
+  }
+
+  // Calculate the next round number
+  const currentRoundNumber = await getCurrentRoundNumber(supabase, prdId);
+  const nextRoundNumber = currentRoundNumber + 1;
+
+  // TODO: Call AI service to generate questions
+  // For now, use mock questions
+  const mockQuestions = [
+    "What are the key user personas for this product?",
+    "What are the main success metrics you want to track?",
+    "Are there any technical constraints we should consider?",
+    "What is the expected timeline for this project?",
+  ];
+
+  // Insert new questions into database
+  const questionsToInsert = mockQuestions.map((question) => ({
+    prd_id: prdId,
+    question,
+    round_number: nextRoundNumber,
+    answer: null,
+  }));
+
+  const { data: insertedQuestions, error: insertError } = await supabase
+    .from("prd_questions")
+    .insert(questionsToInsert)
+    .select();
+
+  if (insertError) {
+    throw new PrdQuestionFetchingError(insertError.message);
+  }
+
+  if (!insertedQuestions) {
+    throw new PrdQuestionFetchingError("Failed to insert questions");
+  }
+
+  return insertedQuestions.map(mapPrdQuestionRowToDto);
 }
