@@ -30,5 +30,15 @@ export const UpdatePrdQuestionsCommandSchema = z.object({
   answers: z.array(PrdQuestionAnswerSchema).min(1, "At least one answer must be provided"),
 });
 
+/**
+ * Schema for validating the round path parameter in GET /api/prds/{id}/rounds/{round}
+ * Accepts either the literal string 'latest' or a positive integer
+ */
+export const PrdRoundParamSchema = z.union([
+  z.literal("latest"),
+  z.coerce.number().int().positive("Round number must be a positive integer"),
+]);
+
 export type GetPrdQuestionsQuery = z.infer<typeof GetPrdQuestionsQuerySchema>;
 export type UpdatePrdQuestionsCommand = z.infer<typeof UpdatePrdQuestionsCommandSchema>;
+export type PrdRoundParam = z.infer<typeof PrdRoundParamSchema>;

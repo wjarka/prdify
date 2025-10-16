@@ -1,10 +1,23 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { PrdQuestion, PrdQuestionDto, PaginatedPrdQuestionsDto, UpdatePrdQuestionsCommand } from "../../types";
+import type {
+  PrdQuestion,
+  PrdQuestionDto,
+  PaginatedPrdQuestionsDto,
+  UpdatePrdQuestionsCommand,
+  PrdQuestionRoundDto,
+} from "../../types";
 import { getCurrentRoundNumber } from "./prds";
 
 const POSTGREST_NOT_FOUND_CODE = "PGRST116";
+
+/**
+ * Options for filtering PRD questions
+ */
+interface GetPrdQuestionsOptions {
+  roundNumber?: number;
+}
 
 export class PrdQuestionFetchingError extends Error {
   constructor(message = "Unable to fetch PRD questions") {
@@ -79,12 +92,14 @@ function handlePrdQuestionUpdatePostgrestError(error: PostgrestError): never {
 /**
  * Retrieves paginated PRD questions for a specific PRD
  * Includes authorization check to ensure user owns the PRD
+ * @param options Optional filtering options (e.g., roundNumber)
  */
 export async function getPrdQuestions(
   supabase: SupabaseClient,
   prdId: string,
   page: number,
-  limit: number
+  limit: number,
+  options?: GetPrdQuestionsOptions
 ): Promise<PaginatedPrdQuestionsDto> {
   // First verify the PRD exists and get basic info (RLS will handle authorization)
   const { data: prdData, error: prdError } = await supabase.from("prds").select("id").eq("id", prdId).single();
@@ -104,21 +119,27 @@ export async function getPrdQuestions(
   const offset = (page - 1) * limit;
 
   try {
+    // Build base query for counting
+    let countQuery = supabase.from("prd_questions").select("*", { count: "exact", head: true }).eq("prd_id", prdId);
+
+    // Build base query for fetching questions
+    let questionsQuery = supabase.from("prd_questions").select("*").eq("prd_id", prdId);
+
+    // Apply round number filter if specified
+    if (options?.roundNumber !== undefined) {
+      countQuery = countQuery.eq("round_number", options.roundNumber);
+      questionsQuery = questionsQuery.eq("round_number", options.roundNumber);
+    }
+
     // Get total count of questions for the PRD
-    const { count, error: countError } = await supabase
-      .from("prd_questions")
-      .select("*", { count: "exact", head: true })
-      .eq("prd_id", prdId);
+    const { count, error: countError } = await countQuery;
 
     if (countError) {
       handlePrdQuestionPostgrestError(countError);
     }
 
     // Get paginated questions
-    const { data: questionsData, error: questionsError } = await supabase
-      .from("prd_questions")
-      .select("*")
-      .eq("prd_id", prdId)
+    const { data: questionsData, error: questionsError } = await questionsQuery
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -281,4 +302,49 @@ export async function generateNextQuestions(supabase: SupabaseClient, prdId: str
   }
 
   return insertedQuestions.map(mapPrdQuestionRowToDto);
+}
+
+/**
+ * Retrieves the latest round of PRD questions for a specific PRD
+ * Calculates the latest round number and uses getPrdQuestions to fetch all questions from that round
+ * @param supabase Supabase client instance
+ * @param prdId PRD identifier
+ * @returns DTO containing questions from the latest round
+ */
+export async function getLatestPrdQuestionRound(supabase: SupabaseClient, prdId: string): Promise<PrdQuestionRoundDto> {
+  // First verify the PRD exists (RLS will handle authorization)
+  const { data: prdData, error: prdError } = await supabase.from("prds").select("id").eq("id", prdId).single();
+
+  if (prdError) {
+    if (prdError.code === POSTGREST_NOT_FOUND_CODE) {
+      throw new PrdNotFoundError();
+    }
+    throw new PrdQuestionFetchingError(prdError.message);
+  }
+
+  if (!prdData) {
+    throw new PrdNotFoundError();
+  }
+
+  try {
+    // Get the latest round number
+    const latestRoundNumber = await getCurrentRoundNumber(supabase, prdId);
+
+    if (latestRoundNumber === 0) {
+      // No rounds exist yet, return empty array
+      return { questions: [] };
+    }
+
+    // Use getPrdQuestions with the calculated round number to fetch all questions from the latest round
+    const paginatedResult = await getPrdQuestions(supabase, prdId, 1, 100, { roundNumber: latestRoundNumber });
+
+    return {
+      questions: paginatedResult.questions,
+    };
+  } catch (error) {
+    if (error instanceof PrdNotFoundError || error instanceof PrdQuestionFetchingError) {
+      throw error;
+    }
+    throw new PrdQuestionFetchingError(error instanceof Error ? error.message : "An unknown error occurred");
+  }
 }

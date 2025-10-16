@@ -112,13 +112,6 @@ export interface GeneratedPrdQuestionsDto {
 }
 
 /**
- * Data Transfer Object for the latest round of PRD questions.
- */
-export interface LatestPrdQuestionRoundDto {
-  questions: PrdQuestionDto[];
-}
-
-/**
  * Data Transfer Object for a specific round of PRD questions.
  */
 export interface PrdQuestionRoundDto {
