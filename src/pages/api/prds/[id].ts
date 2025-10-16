@@ -126,7 +126,11 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 };
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
-  const { supabase } = locals;
+  const { user, supabase } = locals;
+
+  if (!user?.id) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
 
   const validation = prdIdSchema.safeParse(params);
   if (!validation.success) {
