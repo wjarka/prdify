@@ -264,6 +264,37 @@ export async function getPrds(
   }
 }
 
+/**
+ * Completes a PRD by transitioning its status from 'prd_review' to 'completed'.
+ * Once completed, the PRD is considered locked and cannot be edited further.
+ *
+ * @param supabase - The Supabase client instance
+ * @param prdId - The unique identifier of the PRD
+ * @returns Promise resolving to the completed PRD DTO
+ * @throws PrdNotFoundError if PRD doesn't exist
+ * @throws PrdConflictError if PRD is not in prd_review status
+ * @throws PrdUpdateError if database update fails
+ */
+export async function completePrd(supabase: SupabaseClient, prdId: string): Promise<PrdDto> {
+  // Fetch the PRD and validate its existence
+  const prd = await getPrdById(supabase, prdId);
+
+  // Check if the PRD is in the correct status for completion
+  if (prd.status !== "prd_review") {
+    throw new PrdConflictError("PRD must be in prd_review status to be completed");
+  }
+
+  // Update the PRD status to completed
+  const { error } = await supabase.from("prds").update({ status: "completed" }).eq("id", prdId);
+
+  if (error) {
+    throw new PrdUpdateError(`Failed to complete PRD: ${error.message}`);
+  }
+
+  // Fetch and return the updated PRD as DTO
+  return await getPrdById(supabase, prdId);
+}
+
 export async function deletePrd(supabase: SupabaseClient, id: string): Promise<void> {
   const { error, count } = await supabase.from("prds").delete({ count: "exact" }).eq("id", id);
 
