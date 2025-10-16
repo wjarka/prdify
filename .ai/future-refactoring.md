@@ -1,0 +1,1 @@
+1. Avoid repetetive code for error handling / returning error statuses
