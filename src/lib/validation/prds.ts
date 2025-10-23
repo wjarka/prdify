@@ -8,39 +8,36 @@ const SUCCESS_CRITERIA_MAX_LENGTH = 2000;
 
 export const createPrdSchema = z.object({
   name: z
-    .string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
+    .string({ required_error: "Nazwa jest wymagana", invalid_type_error: "Nazwa musi być tekstem" })
     .trim()
-    .min(1, "Name cannot be empty")
-    .max(NAME_MAX_LENGTH, `Name must be at most ${NAME_MAX_LENGTH} characters long`),
+    .min(1, "Nazwa nie może być pusta")
+    .max(NAME_MAX_LENGTH, `Nazwa może mieć maksymalnie ${NAME_MAX_LENGTH} znaków`),
   mainProblem: z
-    .string({ required_error: "Main problem is required", invalid_type_error: "Main problem must be a string" })
+    .string({ required_error: "Główny problem jest wymagany", invalid_type_error: "Główny problem musi być tekstem" })
     .trim()
-    .min(1, "Main problem cannot be empty")
-    .max(MAIN_PROBLEM_MAX_LENGTH, `Main problem must be at most ${MAIN_PROBLEM_MAX_LENGTH} characters long`),
+    .min(1, "Główny problem nie może być pusty")
+    .max(MAIN_PROBLEM_MAX_LENGTH, `Główny problem może mieć maksymalnie ${MAIN_PROBLEM_MAX_LENGTH} znaków`),
   inScope: z
-    .string({ required_error: "In-scope description is required", invalid_type_error: "In-scope must be a string" })
+    .string({ required_error: "Zakres jest wymagany", invalid_type_error: "Zakres musi być tekstem" })
     .trim()
-    .min(1, "In-scope description cannot be empty")
-    .max(IN_SCOPE_MAX_LENGTH, `In-scope description must be at most ${IN_SCOPE_MAX_LENGTH} characters long`),
+    .min(1, "Zakres nie może być pusty")
+    .max(IN_SCOPE_MAX_LENGTH, `Zakres może mieć maksymalnie ${IN_SCOPE_MAX_LENGTH} znaków`),
   outOfScope: z
     .string({
-      required_error: "Out-of-scope description is required",
-      invalid_type_error: "Out-of-scope must be a string",
+      required_error: "Poza zakresem jest wymagane",
+      invalid_type_error: "Poza zakresem musi być tekstem",
     })
     .trim()
-    .min(1, "Out-of-scope description cannot be empty")
-    .max(
-      OUT_OF_SCOPE_MAX_LENGTH,
-      `Out-of-scope description must be at most ${OUT_OF_SCOPE_MAX_LENGTH} characters long`
-    ),
+    .min(1, "Poza zakresem nie może być puste")
+    .max(OUT_OF_SCOPE_MAX_LENGTH, `Poza zakresem może mieć maksymalnie ${OUT_OF_SCOPE_MAX_LENGTH} znaków`),
   successCriteria: z
-    .string({ required_error: "Success criteria is required", invalid_type_error: "Success criteria must be a string" })
+    .string({
+      required_error: "Kryteria sukcesu są wymagane",
+      invalid_type_error: "Kryteria sukcesu muszą być tekstem",
+    })
     .trim()
-    .min(1, "Success criteria cannot be empty")
-    .max(
-      SUCCESS_CRITERIA_MAX_LENGTH,
-      `Success criteria must be at most ${SUCCESS_CRITERIA_MAX_LENGTH} characters long`
-    ),
+    .min(1, "Kryteria sukcesu nie mogą być puste")
+    .max(SUCCESS_CRITERIA_MAX_LENGTH, `Kryteria sukcesu mogą mieć maksymalnie ${SUCCESS_CRITERIA_MAX_LENGTH} znaków`),
 });
 
 export type CreatePrdSchema = typeof createPrdSchema;
@@ -55,7 +52,7 @@ export const getPrdsSchema = z.object({
 export type GetPrdsSchema = z.infer<typeof getPrdsSchema>;
 
 export const prdIdSchema = z.object({
-  id: z.string().uuid({ message: "Invalid PRD ID format" }),
+  id: z.string().uuid({ message: "Nieprawidłowy format ID dokumentu PRD" }),
 });
 
 export type PrdIdSchema = z.infer<typeof prdIdSchema>;
@@ -63,14 +60,14 @@ export type PrdIdSchema = z.infer<typeof prdIdSchema>;
 export const updatePrdSchema = z
   .object({
     name: z
-      .string({ required_error: "Name is required", invalid_type_error: "Name must be a string" })
+      .string({ required_error: "Nazwa jest wymagana", invalid_type_error: "Nazwa musi być tekstem" })
       .trim()
-      .min(1, "Name cannot be empty")
-      .max(NAME_MAX_LENGTH, `Name must be at most ${NAME_MAX_LENGTH} characters long`)
+      .min(1, "Nazwa nie może być pusta")
+      .max(NAME_MAX_LENGTH, `Nazwa może mieć maksymalnie ${NAME_MAX_LENGTH} znaków`)
       .optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
-    message: "At least one field must be provided to update.",
+    message: "Przynajmniej jedno pole musi być podane do aktualizacji.",
     path: [], // an empty path makes it a global error
   });
 

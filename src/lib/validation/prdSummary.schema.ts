@@ -8,10 +8,10 @@ const SUMMARY_MAX_LENGTH = 10000;
  */
 export const updatePrdSummarySchema = z.object({
   summary: z
-    .string({ required_error: "Summary is required", invalid_type_error: "Summary must be a string" })
+    .string({ required_error: "Podsumowanie jest wymagane", invalid_type_error: "Podsumowanie musi być tekstem" })
     .trim()
-    .min(1, "Summary cannot be empty")
-    .max(SUMMARY_MAX_LENGTH, `Summary must be at most ${SUMMARY_MAX_LENGTH} characters long`),
+    .min(1, "Podsumowanie nie może być puste")
+    .max(SUMMARY_MAX_LENGTH, `Podsumowanie może mieć maksymalnie ${SUMMARY_MAX_LENGTH} znaków`),
 });
 
 export type UpdatePrdSummarySchema = z.infer<typeof updatePrdSummarySchema>;

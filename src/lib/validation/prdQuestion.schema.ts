@@ -5,12 +5,12 @@ import { z } from "zod";
  * Validates page and limit parameters for pagination
  */
 export const GetPrdQuestionsQuerySchema = z.object({
-  page: z.coerce.number().int().min(1, "Page must be a positive integer").default(1),
+  page: z.coerce.number().int().min(1, "Strona musi być dodatnią liczbą całkowitą").default(1),
   limit: z.coerce
     .number()
     .int()
-    .min(1, "Limit must be a positive integer")
-    .max(100, "Limit cannot exceed 100")
+    .min(1, "Limit musi być dodatnią liczbą całkowitą")
+    .max(100, "Limit nie może przekroczyć 100")
     .default(20),
 });
 
@@ -18,8 +18,8 @@ export const GetPrdQuestionsQuerySchema = z.object({
  * Schema for validating a single answer in the PATCH request body
  */
 export const PrdQuestionAnswerSchema = z.object({
-  questionId: z.string().uuid("Question ID must be a valid UUID"),
-  text: z.string().min(1, "Answer text cannot be empty").trim(),
+  questionId: z.string().uuid("ID pytania musi być prawidłowym UUID"),
+  text: z.string().min(1, "Odpowiedź nie może być pusta").trim(),
 });
 
 /**
@@ -27,7 +27,7 @@ export const PrdQuestionAnswerSchema = z.object({
  * Validates the answers array for submitting answers to PRD questions
  */
 export const UpdatePrdQuestionsCommandSchema = z.object({
-  answers: z.array(PrdQuestionAnswerSchema).min(1, "At least one answer must be provided"),
+  answers: z.array(PrdQuestionAnswerSchema).min(1, "Przynajmniej jedna odpowiedź musi być podana"),
 });
 
 /**
@@ -36,7 +36,7 @@ export const UpdatePrdQuestionsCommandSchema = z.object({
  */
 export const PrdRoundParamSchema = z.union([
   z.literal("latest"),
-  z.coerce.number().int().positive("Round number must be a positive integer"),
+  z.coerce.number().int().positive("Numer rundy musi być dodatnią liczbą całkowitą"),
 ]);
 
 export type GetPrdQuestionsQuery = z.infer<typeof GetPrdQuestionsQuerySchema>;
