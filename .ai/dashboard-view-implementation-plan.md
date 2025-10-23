@@ -82,7 +82,7 @@ Oprócz istniejących DTO (`PrdListItemDto`, `PaginatedPrdsDto`, `CreatePrdComma
     queryParams: {
       page: number;
       limit: number;
-      sortBy: 'updated_at' | 'created_at' | 'name';
+      sortBy: 'name' | 'status' | 'createdAt' | 'updatedAt';
       order: 'asc' | 'desc';
     };
     isDeleteDialogOpen: boolean;
@@ -100,7 +100,7 @@ Oprócz istniejących DTO (`PrdListItemDto`, `PaginatedPrdsDto`, `CreatePrdComma
   const statusMap: Record<PrdStatus, PrdStatusViewModel> = {
     'planning': { text: 'Planowanie', variant: 'default' },
     'planning_review': { text: 'Podsumowanie', variant: 'secondary' },
-    'document_generation': { text: 'Generowanie PRD', variant: 'outline' },
+    'prd_review': { text: 'Przeglądanie PRD', variant: 'outline' },
     'completed': { text: 'Ukończony', variant: 'default' },
   };
   ```
