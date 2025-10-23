@@ -1,0 +1,30 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { PRDWorkspace } from "../../components/prd/PRDWorkspace";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/");
+}
+
+// Verify the PRD exists and the user has access
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/");
+}
+
+const supabase = Astro.locals.supabase;
+const { data: prd, error } = await supabase.from("prds").select("id, name").eq("id", id).single();
+
+if (error || !prd) {
+  return Astro.redirect("/");
+}
+---
+
+<Layout title={prd.name}>
+  <PRDWorkspace prdId={id} client:load />
+</Layout>
+

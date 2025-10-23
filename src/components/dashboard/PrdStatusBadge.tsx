@@ -1,10 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import type { PrdStatus } from "@/types";
-
-interface PrdStatusViewModel {
-  text: string;
-  variant: "default" | "secondary" | "destructive" | "outline";
-}
+import type { PrdStatusViewModel } from "@/types/viewModels";
 
 const statusMap: Record<PrdStatus, PrdStatusViewModel> = {
   planning: { text: "Planowanie", variant: "default" },
