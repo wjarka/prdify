@@ -1,8 +1,8 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import { DashboardView } from "@/components/views/DashboardView";
+import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="Dashboard - PRDify">
+  <DashboardView client:load />
 </Layout>
