@@ -9,6 +9,8 @@ import type {
   PrdQuestionRoundDto,
 } from "../../types";
 import { getCurrentRoundNumber } from "./prds";
+import { OpenRouterService, type JsonSchema } from "./openrouter.service";
+import { NetworkError, ApiError, ParsingError, ValidationError } from "./openrouter.types";
 
 const POSTGREST_NOT_FOUND_CODE = "PGRST116";
 
@@ -17,6 +19,21 @@ const POSTGREST_NOT_FOUND_CODE = "PGRST116";
  */
 interface GetPrdQuestionsOptions {
   roundNumber?: number;
+}
+
+/**
+ * Type definition for a single question with recommendation from the AI
+ */
+interface QuestionWithRecommendation {
+  question: string;
+  recommendation: string;
+}
+
+/**
+ * Type definition for the AI response containing questions
+ */
+interface AiQuestionsResponse {
+  questions: QuestionWithRecommendation[];
 }
 
 export class PrdQuestionFetchingError extends Error {
@@ -61,6 +78,13 @@ export class PrdQuestionGenerationError extends Error {
   }
 }
 
+export class PrdQuestionAiGenerationError extends Error {
+  constructor(message = "Failed to generate questions using AI service") {
+    super(message);
+    this.name = "PrdQuestionAiGenerationError";
+  }
+}
+
 /**
  * Maps a PrdQuestion database row to a PrdQuestionDto
  */
@@ -87,6 +111,115 @@ function handlePrdQuestionPostgrestError(error: PostgrestError): never {
  */
 function handlePrdQuestionUpdatePostgrestError(error: PostgrestError): never {
   throw new PrdQuestionUpdateError(error.message);
+}
+
+/**
+ * Defines the JSON schema for AI-generated questions
+ */
+function getQuestionsJsonSchema(): JsonSchema {
+  return {
+    name: "prd_questions",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        questions: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              question: {
+                type: "string",
+                description: "The question to ask about the PRD",
+              },
+              recommendation: {
+                type: "string",
+                description: "A recommendation or suggestion related to the question",
+              },
+            },
+            required: ["question", "recommendation"],
+            additionalProperties: false,
+          },
+          minItems: 5,
+          maxItems: 10,
+        },
+      },
+      required: ["questions"],
+      additionalProperties: false,
+    },
+  };
+}
+
+/**
+ * Builds the system prompt for question generation
+ */
+function buildSystemPrompt(): string {
+  return `You are an experienced product manager whose task is to help create a comprehensive Product Requirements Document (PRD) based on the provided information. Your goal is to generate a list of questions and recommendations that will be used in subsequent prompting to create a complete PRD.
+
+Consider the following aspects in your analysis:
+1. Identify the main problem that the product is intended to solve.
+2. Define the key functionalities of the MVP.
+3. Consider potential user stories and paths of product usage.
+4. Think about success criteria and how to measure them.
+5. Assess design constraints and their impact on product development.
+
+Based on your analysis, generate a list of 5-10 questions and recommendations in a combined form (question + recommendation). These should address any ambiguities, potential issues, or areas where more information is needed to create an effective PRD. Consider questions about:
+
+1. Details of the user's problem
+2. Prioritization of functionality
+3. Expected user experience
+4. Measurable success indicators
+5. Potential risks and challenges
+6. Schedule and resources
+
+Remember to focus on clarity, relevance, and accuracy of results. Do not include any additional comments or explanations beyond the specified output format.`;
+}
+
+/**
+ * Builds the user prompt with PRD information and previous Q&A context
+ */
+function buildUserPrompt(
+  mainProblem: string,
+  inScope: string,
+  outOfScope: string,
+  successCriteria: string,
+  previousQuestionsAndAnswers?: PrdQuestionDto[]
+): string {
+  let prompt = `Please carefully review the following information:
+
+<project_description>
+Main Problem: ${mainProblem}
+
+In Scope: ${inScope}
+
+Out of Scope: ${outOfScope}
+
+Success Criteria: ${successCriteria}
+</project_description>`;
+
+  // Add previous Q&A context if available
+  if (previousQuestionsAndAnswers && previousQuestionsAndAnswers.length > 0) {
+    prompt += `\n\n<previous_rounds>
+The following questions have already been asked and answered in previous rounds:
+
+`;
+    for (const qa of previousQuestionsAndAnswers) {
+      prompt += `Q: ${qa.question}\nA: ${qa.answer || "(Not answered yet)"}\n\n`;
+    }
+    prompt += `</previous_rounds>
+
+Based on the project description and the previous questions and answers, generate new questions that:
+1. Build upon the information already gathered
+2. Explore areas not yet covered
+3. Help clarify any remaining ambiguities
+4. Do NOT repeat questions that have already been asked`;
+  } else {
+    prompt += `\n\nThis is the first round of questions. Generate initial questions to help understand the project better and gather essential information for creating a comprehensive PRD.`;
+  }
+
+  prompt += `\n\nGenerate your questions and recommendations now.`;
+
+  return prompt;
 }
 
 /**
@@ -250,7 +383,11 @@ export async function submitAnswers(
  */
 export async function generateNextQuestions(supabase: SupabaseClient, prdId: string): Promise<PrdQuestionDto[]> {
   // First verify the PRD exists and is in planning status
-  const { data: prdData, error: prdError } = await supabase.from("prds").select("id, status").eq("id", prdId).single();
+  const { data: prdData, error: prdError } = await supabase
+    .from("prds")
+    .select("id, status, main_problem, in_scope, out_of_scope, success_criteria")
+    .eq("id", prdId)
+    .single();
 
   if (prdError) {
     if (prdError.code === POSTGREST_NOT_FOUND_CODE) {
@@ -271,37 +408,90 @@ export async function generateNextQuestions(supabase: SupabaseClient, prdId: str
   const currentRoundNumber = await getCurrentRoundNumber(supabase, prdId);
   const nextRoundNumber = currentRoundNumber + 1;
 
-  // TODO: Call AI service to generate questions
-  // For now, use mock questions
-  const mockQuestions = [
-    "What are the key user personas for this product?",
-    "What are the main success metrics you want to track?",
-    "Are there any technical constraints we should consider?",
-    "What is the expected timeline for this project?",
-  ];
+  try {
+    // Get all previous questions and answers for context
+    const { data: previousQuestions, error: previousQuestionsError } = await supabase
+      .from("prd_questions")
+      .select("*")
+      .eq("prd_id", prdId)
+      .order("round_number", { ascending: true })
+      .order("created_at", { ascending: true });
 
-  // Insert new questions into database
-  const questionsToInsert = mockQuestions.map((question) => ({
-    prd_id: prdId,
-    question,
-    round_number: nextRoundNumber,
-    answer: null,
-  }));
+    if (previousQuestionsError) {
+      throw new PrdQuestionFetchingError(previousQuestionsError.message);
+    }
 
-  const { data: insertedQuestions, error: insertError } = await supabase
-    .from("prd_questions")
-    .insert(questionsToInsert)
-    .select();
+    const previousQuestionsDto = previousQuestions?.map(mapPrdQuestionRowToDto) ?? [];
 
-  if (insertError) {
-    throw new PrdQuestionFetchingError(insertError.message);
+    // Build prompts for AI service
+    const systemPrompt = buildSystemPrompt();
+    const userPrompt = buildUserPrompt(
+      prdData.main_problem,
+      prdData.in_scope,
+      prdData.out_of_scope,
+      prdData.success_criteria,
+      previousQuestionsDto
+    );
+
+    // Call OpenRouter service to generate questions
+    const openRouterService = OpenRouterService.getInstance();
+    const aiResponse = await openRouterService.getStructuredResponse<AiQuestionsResponse>({
+      systemPrompt,
+      userPrompt,
+      jsonSchema: getQuestionsJsonSchema(),
+      params: {
+        temperature: 0.7,
+        max_tokens: 4000,
+      },
+    });
+
+    // Transform AI response to questions with combined question + recommendation format
+    const questionsToInsert = aiResponse.questions.map((item) => ({
+      prd_id: prdId,
+      question: `${item.question}\n\nRecommendation: ${item.recommendation}`,
+      round_number: nextRoundNumber,
+      answer: null,
+    }));
+
+    // Insert new questions into database
+    const { data: insertedQuestions, error: insertError } = await supabase
+      .from("prd_questions")
+      .insert(questionsToInsert)
+      .select();
+
+    if (insertError) {
+      throw new PrdQuestionFetchingError(insertError.message);
+    }
+
+    if (!insertedQuestions) {
+      throw new PrdQuestionFetchingError("Failed to insert questions");
+    }
+
+    return insertedQuestions.map(mapPrdQuestionRowToDto);
+  } catch (error) {
+    // Handle OpenRouter-specific errors
+    if (
+      error instanceof NetworkError ||
+      error instanceof ApiError ||
+      error instanceof ParsingError ||
+      error instanceof ValidationError
+    ) {
+      throw new PrdQuestionAiGenerationError(`AI service error: ${error.message}`);
+    }
+
+    // Re-throw known errors
+    if (
+      error instanceof PrdNotFoundError ||
+      error instanceof PrdQuestionGenerationError ||
+      error instanceof PrdQuestionFetchingError ||
+      error instanceof PrdQuestionAiGenerationError
+    ) {
+      throw error;
+    }
+
+    // Handle unknown errors
+    throw new PrdQuestionAiGenerationError(error instanceof Error ? error.message : "An unknown error occurred");
   }
-
-  if (!insertedQuestions) {
-    throw new PrdQuestionFetchingError("Failed to insert questions");
-  }
-
-  return insertedQuestions.map(mapPrdQuestionRowToDto);
 }
 
 /**
