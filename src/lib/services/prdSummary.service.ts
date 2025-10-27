@@ -2,6 +2,7 @@ import type { SupabaseClient } from "../../db/supabase.client";
 import type { PrdQuestionDto, PrdDto } from "../../types";
 import { getPrdById } from "./prds";
 import { getPrdQuestions } from "./prdQuestion.service";
+import { OpenRouterService, type JsonSchema } from "./openrouter.service";
 
 /**
  * Custom error classes for PRD summary operations
@@ -151,53 +152,123 @@ export async function generateSummary(supabase: SupabaseClient, prdId: string): 
 }
 
 /**
- * Constructs a prompt for the AI service to generate a PRD summary
+ * JSON Schema for AI summary response
  */
-function constructSummaryPrompt(prd: PrdDto, questions: PrdQuestionDto[]): string {
+const SUMMARY_RESPONSE_SCHEMA: JsonSchema = {
+  name: "prd_summary_response",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      summary: {
+        type: "string",
+        description: "The complete markdown-formatted summary including all sections",
+      },
+    },
+    required: ["summary"],
+    additionalProperties: false,
+  },
+};
+
+/**
+ * Constructs the planning session history for the AI prompt
+ */
+function constructPlanningSessionHistory(prd: PrdDto, questions: PrdQuestionDto[]): string {
   const qAndASection = questions
-    .map((q, index) => `Q${index + 1}: ${q.question}\nA${index + 1}: ${q.answer}`)
+    .map((q, index) => `**Question ${index + 1}:** ${q.question}\n**Answer ${index + 1}:** ${q.answer}`)
     .join("\n\n");
 
-  return `Based on the following Product Requirement Document (PRD) information and the Q&A session that followed, generate a comprehensive summary of the planning session.
+  return `# Project Description
+**Name:** ${prd.name}
 
-PRD Details:
-Name: ${prd.name}
-Main Problem: ${prd.mainProblem}
-In Scope: ${prd.inScope}
-Out of Scope: ${prd.outOfScope}
-Success Criteria: ${prd.successCriteria}
+# Identified User Problem
+${prd.mainProblem}
 
-Q&A Session:
-${qAndASection}
+# In Scope
+${prd.inScope}
 
-Please provide a detailed summary that captures the key insights, clarifications, and refinements that emerged from the Q&A session. Focus on how the answers helped shape and refine the understanding of the PRD requirements.`;
+# Out of Scope
+${prd.outOfScope}
+
+# Success Criteria
+${prd.successCriteria}
+
+# Conversation History
+${qAndASection}`;
 }
 
 /**
- * Mock AI service call for generating summary
- * TODO: Replace with actual AI service integration (OpenRouter.ai)
+ * Constructs the complete user prompt with planning session history
+ */
+function constructSummaryPrompt(prd: PrdDto, questions: PrdQuestionDto[]): string {
+  const planningSessionHistory = constructPlanningSessionHistory(prd, questions);
+
+  return `${planningSessionHistory}
+
+---
+
+You are an AI assistant whose task is to summarize a conversation about PRD (Product Requirements Document) planning for MVP and prepare a concise summary for the next development stage. In the conversation history you will find the following information:
+1. Project description
+2. Identified user problem
+3. Conversation history containing questions and answers
+4. Recommendations regarding PRD content
+
+Your task is to:
+1. Summarize the conversation history, focusing on all decisions related to PRD planning.
+2. Match the model's recommendations to the answers given in the conversation history. Identify which recommendations are relevant based on the discussion.
+3. Prepare a detailed conversation summary that includes:
+   a. Main functional requirements of the product
+   b. Key user stories and usage paths
+   c. Important success criteria and ways to measure them
+   d. Any unresolved issues or areas requiring further clarification
+4. Format the results as follows:
+
+<conversation_summary>
+<decisions>
+[List decisions made by the user, numbered].
+</decisions>
+
+<matched_recommendations>
+[List of the most relevant recommendations matched to the conversation, numbered]
+</matched_recommendations>
+
+<prd_planning_summary>
+[Provide a detailed summary of the conversation, including the elements listed in step 3].
+</prd_planning_summary>
+
+<unresolved_issues>
+[List any unresolved issues or areas requiring further clarification, if any exist]
+</unresolved_issues>
+</conversation_summary>
+
+The final result should contain only content in markdown format. Ensure that your summary is clear, concise, and provides valuable information for the next stage of creating the PRD.`;
+}
+
+/**
+ * Generates a summary using OpenRouter AI service
+ * @throws PrdSummaryGenerationError if AI service fails
  */
 async function generateSummaryWithAI(prompt: string): Promise<string> {
-  // Mock implementation - in real implementation, this would call OpenRouter.ai
+  try {
+    const openRouterService = OpenRouterService.getInstance();
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+    interface SummaryResponse {
+      summary: string;
+    }
 
-  // Mock response - in real implementation, this would be the AI-generated summary
-  return `## Planning Session Summary
+    const response = await openRouterService.getStructuredResponse<SummaryResponse>({
+      systemPrompt:
+        "You are an expert technical writer specializing in Product Requirements Documents. Your role is to analyze planning sessions and create comprehensive, well-structured summaries that help development teams understand project requirements clearly.",
+      userPrompt: prompt,
+      jsonSchema: SUMMARY_RESPONSE_SCHEMA,
+      params: {
+        temperature: 0.7,
+      },
+    });
 
-Based on the comprehensive Q&A session conducted for the PRD "${prompt.split("\n")[2].split(": ")[1]}", the following key insights and clarifications have been identified:
-
-### Key Requirements Confirmed
-- The main problem statement has been validated through detailed questioning
-- Scope boundaries have been clearly defined and agreed upon
-- Success criteria have been refined based on stakeholder feedback
-
-### Critical Clarifications
-- Several important details were uncovered during the questioning phase
-- Technical constraints and business requirements were thoroughly explored
-- Edge cases and potential implementation challenges were identified
-
-### Next Steps
-This summary represents the culmination of the planning phase and provides a solid foundation for moving forward to the PRD drafting stage. All critical questions have been addressed, and the project team has a clear understanding of the requirements and constraints.`;
+    return response.summary;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    throw new PrdSummaryGenerationError(`Failed to generate summary with AI: ${errorMessage}`);
+  }
 }
