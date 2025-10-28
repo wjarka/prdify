@@ -83,9 +83,7 @@ export const PasswordRecoveryForm: FC = () => {
         <Input id="email" type="email" placeholder="twoj@email.pl" disabled={isSubmitting} {...register("email")} />
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
         {!errors.email && (
-          <p className="text-xs text-muted-foreground">
-            Wyślemy Ci link do resetowania hasła na podany adres e-mail
-          </p>
+          <p className="text-xs text-muted-foreground">Wyślemy Ci link do resetowania hasła na podany adres e-mail</p>
         )}
       </div>
 
@@ -102,10 +100,7 @@ export const PasswordRecoveryForm: FC = () => {
         </Button>
 
         <div className="text-center text-sm space-y-2">
-          <a
-            href="/auth/login"
-            className="text-muted-foreground hover:text-primary transition-colors"
-          >
+          <a href="/auth/login" className="text-muted-foreground hover:text-primary transition-colors">
             Wróć do logowania
           </a>
           <p className="text-muted-foreground">
@@ -121,4 +116,3 @@ export const PasswordRecoveryForm: FC = () => {
 };
 
 export default PasswordRecoveryForm;
-

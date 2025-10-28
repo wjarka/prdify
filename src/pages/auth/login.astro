@@ -1,6 +1,9 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { LoginForm } from "@/components/auth/LoginForm";
+
+// Note: Zalogowani użytkownicy są automatycznie przekierowywani przez middleware
+// Middleware sprawdza czy użytkownik jest zalogowany i przekierowuje na /
 ---
 
 <Layout title="Logowanie" description="Zaloguj się do swojego konta PRDify" variant="auth">

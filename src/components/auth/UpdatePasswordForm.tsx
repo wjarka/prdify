@@ -111,4 +111,3 @@ export const UpdatePasswordForm: FC = () => {
 };
 
 export default UpdatePasswordForm;
-

@@ -36,11 +36,11 @@ export const LoginForm: FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Nieprawidłowe dane logowania");
+        throw new Error(errorData.error || "Nieprawidłowe dane logowania");
       }
 
       // Przekierowanie po pomyślnym zalogowaniu
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Wystąpił błąd podczas logowania");
     } finally {
