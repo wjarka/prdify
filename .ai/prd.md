@@ -46,6 +46,8 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
   - Formularz wymaga podania adresu e-mail i hasła.
   - System waliduje format adresu e-mail.
   - Po pomyślnej rejestracji użytkownik jest automatycznie zalogowany i przekierowany do panelu głównego.
+  - Rejestracja odbywa się na dedykowanej stronie
+  - Odnośnik do stropanel-3-99ny rejestracji znajduje się w prawym górnym rogu
 
 - ID: US-002
 - Tytuł: Logowanie użytkownika
@@ -54,6 +56,10 @@ Następujące funkcje nie wchodzą w zakres wersji MVP:
   - Formularz logowania zawiera pola na e-mail i hasło.
   - W przypadku podania błędnych danych, wyświetlany jest stosowny komunikat.
   - Po pomyślnym zalogowaniu użytkownik jest przekierowany do panelu z listą swoich PRD.
+  - Odnośnik do strony logowania znajduje się w prawym górnym rogu
+  - Użytkownik musi być zalogowany, aby korzystać z jakiekolwiek strony w systemie za wyjątkiem strony logowania lub rejestracji
+  - Użytkownik powinien mieć możliwość odzyskania hasła
+  - Użytkownik powinien mieć możliwość wylogowania się
 
 - ID: US-003
 - Tytuł: Tworzenie nowego PRD
