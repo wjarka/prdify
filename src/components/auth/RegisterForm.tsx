@@ -107,4 +107,3 @@ export const RegisterForm: FC = () => {
 };
 
 export default RegisterForm;
-
