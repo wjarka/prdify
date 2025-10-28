@@ -79,16 +79,9 @@ export const UpdatePasswordForm: FC = () => {
 
       <div className="space-y-2">
         <Label htmlFor="password">Nowe hasło</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          aria-invalid={!!errors.password}
-          disabled={isSubmitting}
-          {...register("password")}
-        />
+        <Input id="password" type="password" placeholder="••••••••" disabled={isSubmitting} {...register("password")} />
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
-        <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 6 znaków</p>
+        {!errors.password && <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 6 znaków</p>}
       </div>
 
       <div className="space-y-2">
@@ -97,13 +90,10 @@ export const UpdatePasswordForm: FC = () => {
           id="confirmPassword"
           type="password"
           placeholder="••••••••"
-          aria-invalid={!!errors.confirmPassword}
           disabled={isSubmitting}
           {...register("confirmPassword")}
         />
-        {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-        )}
+        {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="w-full">

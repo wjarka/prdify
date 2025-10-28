@@ -80,18 +80,13 @@ export const PasswordRecoveryForm: FC = () => {
 
       <div className="space-y-2">
         <Label htmlFor="email">Adres e-mail</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="twoj@email.pl"
-          aria-invalid={!!errors.email}
-          disabled={isSubmitting}
-          {...register("email")}
-        />
+        <Input id="email" type="email" placeholder="twoj@email.pl" disabled={isSubmitting} {...register("email")} />
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
-        <p className="text-xs text-muted-foreground">
-          Wyślemy Ci link do resetowania hasła na podany adres e-mail
-        </p>
+        {!errors.email && (
+          <p className="text-xs text-muted-foreground">
+            Wyślemy Ci link do resetowania hasła na podany adres e-mail
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">

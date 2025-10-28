@@ -58,29 +58,15 @@ export const RegisterForm: FC = () => {
 
       <div className="space-y-2">
         <Label htmlFor="email">Adres e-mail</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="twoj@email.pl"
-          aria-invalid={!!errors.email}
-          disabled={isSubmitting}
-          {...register("email")}
-        />
+        <Input id="email" type="email" placeholder="twoj@email.pl" disabled={isSubmitting} {...register("email")} />
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="password">Hasło</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          aria-invalid={!!errors.password}
-          disabled={isSubmitting}
-          {...register("password")}
-        />
+        <Input id="password" type="password" placeholder="••••••••" disabled={isSubmitting} {...register("password")} />
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
-        <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 6 znaków</p>
+        {!errors.password && <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 6 znaków</p>}
       </div>
 
       <div className="flex flex-col gap-4">
