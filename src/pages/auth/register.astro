@@ -1,0 +1,15 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+---
+
+<Layout title="Rejestracja" description="Utwórz nowe konto PRDify" variant="auth">
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold tracking-tight">Utwórz konto</h2>
+      <p class="text-sm text-muted-foreground">Wprowadź swoje dane, aby utworzyć nowe konto</p>
+    </div>
+
+    <RegisterForm client:load />
+  </div>
+</Layout>

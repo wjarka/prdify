@@ -1,24 +1,60 @@
 ---
 import "../styles/global.css";
+import Header from "@/components/Header.astro";
 
 interface Props {
-  title?: string;
+  title: string;
+  description?: string;
+  variant?: "default" | "auth";
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
+const { title, description, variant = "default" } = Astro.props;
+
+// Pobierz dane sesji z Astro.locals (będą dostarczone przez middleware)
+const session = Astro.locals.session;
+const user = Astro.locals.user;
+const isAuthenticated = !!session && !!user;
+const userEmail = user?.email || "";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <title>{title} | PRDify</title>
   </head>
-  <body>
-    <slot />
+  <body
+    class:list={[
+      "min-h-screen bg-background",
+      {
+        "flex items-center justify-center p-4": variant === "auth",
+      },
+    ]}
+  >
+    {
+      variant === "auth" ? (
+        <div class="w-full max-w-md">
+          <div class="mb-8">
+            <Header variant="centered" />
+          </div>
+
+          <div class="bg-card rounded-xl border shadow-sm p-6">
+            <slot />
+          </div>
+        </div>
+      ) : (
+        <>
+          <Header isAuthenticated={isAuthenticated} userEmail={userEmail} />
+          <main>
+            <slot />
+          </main>
+        </>
+      )
+    }
   </body>
 </html>
 
@@ -27,6 +63,6 @@ const { title = "10x Astro Starter" } = Astro.props;
   body {
     margin: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
   }
 </style>

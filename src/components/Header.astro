@@ -1,0 +1,94 @@
+---
+interface Props {
+  isAuthenticated?: boolean;
+  userEmail?: string;
+  variant?: "default" | "centered";
+}
+
+const { isAuthenticated = false, userEmail = "", variant = "default" } = Astro.props;
+---
+
+<header class:list={["bg-background", { "border-b": variant === "default" }]}>
+  <div class="container mx-auto px-4 py-4">
+    <nav
+      class:list={[
+        "flex items-center",
+        {
+          "justify-between": variant === "default",
+          "justify-center flex-col gap-6": variant === "centered",
+        },
+      ]}
+      aria-label="Główna nawigacja"
+    >
+      <div
+        class:list={[
+          "flex items-center",
+          {
+            "gap-8": variant === "default",
+            "flex-col gap-2 text-center": variant === "centered",
+          },
+        ]}
+      >
+        <a
+          href="/"
+          class:list={[
+            "font-bold text-primary hover:text-primary/80 transition-colors",
+            {
+              "text-xl": variant === "default",
+              "text-3xl": variant === "centered",
+            },
+          ]}
+        >
+          PRDify
+        </a>
+
+        {variant === "centered" && <p class="text-muted-foreground text-sm">Twórz dokumenty PRD z pomocą AI</p>}
+
+        {
+          variant === "default" && isAuthenticated && (
+            <a href="/dashboard" class="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Dashboard
+            </a>
+          )
+        }
+      </div>
+
+      {
+        variant === "default" && (
+          <div class="flex items-center gap-4">
+            {!isAuthenticated ? (
+              <>
+                <a
+                  href="/auth/login"
+                  class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Zaloguj się
+                </a>
+                <a
+                  href="/auth/register"
+                  class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 transition-colors"
+                >
+                  Zarejestruj się
+                </a>
+              </>
+            ) : (
+              <div class="flex items-center gap-4">
+                <span class="text-sm text-muted-foreground" aria-label="E-mail użytkownika">
+                  {userEmail}
+                </span>
+                <form action="/api/auth/logout" method="POST">
+                  <button
+                    type="submit"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 transition-colors"
+                  >
+                    Wyloguj się
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        )
+      }
+    </nav>
+  </div>
+</header>

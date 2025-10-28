@@ -1,0 +1,20 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="Weryfikacja" description="Trwa weryfikacja Twojego konta" variant="auth">
+  <div class="space-y-6 text-center">
+    <div class="flex justify-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold tracking-tight">Weryfikacja konta</h2>
+      <p class="text-sm text-muted-foreground">Proszę czekać, trwa weryfikacja Twojego konta...</p>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Ta strona będzie obsługiwana przez middleware/API endpoint, który przekieruje użytkownika po zakończeniu weryfikacji
+</script>
