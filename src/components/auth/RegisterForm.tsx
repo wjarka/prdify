@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/spinner";
 export const RegisterForm: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -24,6 +25,7 @@ export const RegisterForm: FC = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setIsSubmitting(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
       const response = await fetch("/api/auth/register", {
@@ -36,11 +38,18 @@ export const RegisterForm: FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Nie udało się utworzyć konta");
+        throw new Error(errorData.error || "Nie udało się utworzyć konta");
       }
 
-      // Przekierowanie po pomyślnej rejestracji
-      window.location.href = "/dashboard";
+      const result = await response.json();
+
+      // Sprawdź czy wymagane jest potwierdzenie emaila
+      if (result.requiresEmailConfirmation) {
+        setSuccessMessage(result.message);
+      } else {
+        // Jeśli nie wymaga potwierdzenia, przekieruj do dashboard
+        window.location.href = "/";
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Wystąpił błąd podczas rejestracji");
     } finally {
@@ -56,21 +65,27 @@ export const RegisterForm: FC = () => {
         </Alert>
       )}
 
+      {successMessage && (
+        <Alert>
+          <AlertDescription>{successMessage}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="email">Adres e-mail</Label>
-        <Input id="email" type="email" placeholder="twoj@email.pl" disabled={isSubmitting} {...register("email")} />
+        <Input id="email" type="email" placeholder="twoj@email.pl" disabled={isSubmitting || !!successMessage} {...register("email")} />
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="password">Hasło</Label>
-        <Input id="password" type="password" placeholder="••••••••" disabled={isSubmitting} {...register("password")} />
+        <Input id="password" type="password" placeholder="••••••••" disabled={isSubmitting || !!successMessage} {...register("password")} />
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
         {!errors.password && <p className="text-xs text-muted-foreground">Hasło musi mieć co najmniej 6 znaków</p>}
       </div>
 
       <div className="flex flex-col gap-4">
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button type="submit" disabled={isSubmitting || !!successMessage} className="w-full">
           {isSubmitting ? (
             <>
               <Spinner size="sm" />

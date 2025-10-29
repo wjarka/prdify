@@ -1,20 +1,74 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+
+// Handle email confirmation callback
+const code = Astro.url.searchParams.get("code");
+const next = Astro.url.searchParams.get("next") || "/";
+const error = Astro.url.searchParams.get("error");
+
+// If there's an error parameter, show error message
+if (error) {
+  // Errors are handled in the UI below
+} else if (code) {
+  try {
+    // Exchange the code for a session
+    const { error: exchangeError } = await Astro.locals.supabase.auth.exchangeCodeForSession(code);
+
+    if (!exchangeError) {
+      // Successful authentication - redirect to the next page
+      return Astro.redirect(next);
+    }
+
+    // If there was an error, redirect to login with error
+    return Astro.redirect("/auth/login?error=invalid_code");
+  } catch {
+    // Handle unexpected errors
+    return Astro.redirect("/auth/login?error=unexpected_error");
+  }
+} else {
+  // No code or error - redirect to login
+  return Astro.redirect("/auth/login");
+}
+
+// Error messages mapping
+const errorMessages: Record<string, string> = {
+  missing_code: "Brak kodu weryfikacyjnego",
+  invalid_code: "Nieprawidłowy kod weryfikacyjny. Link mógł wygasnąć",
+  unexpected_error: "Wystąpił nieoczekiwany błąd podczas weryfikacji",
+};
+
+const errorMessage = error ? errorMessages[error] || "Wystąpił błąd podczas weryfikacji" : null;
 ---
 
 <Layout title="Weryfikacja" description="Trwa weryfikacja Twojego konta" variant="auth">
-  <div class="space-y-6 text-center">
-    <div class="flex justify-center">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-    </div>
+  {
+    errorMessage ? (
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <h2 class="text-2xl font-semibold tracking-tight text-destructive">Błąd weryfikacji</h2>
+          <p class="text-sm text-muted-foreground">{errorMessage}</p>
+        </div>
 
-    <div class="space-y-2">
-      <h2 class="text-2xl font-semibold tracking-tight">Weryfikacja konta</h2>
-      <p class="text-sm text-muted-foreground">Proszę czekać, trwa weryfikacja Twojego konta...</p>
-    </div>
-  </div>
+        <div class="flex justify-center">
+          <a
+            href="/auth/login"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+          >
+            Przejdź do logowania
+          </a>
+        </div>
+      </div>
+    ) : (
+      <div class="space-y-6 text-center">
+        <div class="flex justify-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+        </div>
+
+        <div class="space-y-2">
+          <h2 class="text-2xl font-semibold tracking-tight">Weryfikacja konta</h2>
+          <p class="text-sm text-muted-foreground">Proszę czekać, trwa weryfikacja Twojego konta...</p>
+        </div>
+      </div>
+    )
+  }
 </Layout>
-
-<script>
-  // Ta strona będzie obsługiwana przez middleware/API endpoint, który przekieruje użytkownika po zakończeniu weryfikacji
-</script>

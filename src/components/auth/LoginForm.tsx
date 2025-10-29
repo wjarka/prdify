@@ -11,7 +11,22 @@ import { Spinner } from "@/components/ui/spinner";
 
 export const LoginForm: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    // Check for error in URL parameters (e.g., from callback redirect)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlError = params.get("error");
+      if (urlError) {
+        const errorMessages: Record<string, string> = {
+          missing_code: "Brak kodu weryfikacyjnego",
+          invalid_code: "Nieprawidłowy kod weryfikacyjny. Link mógł wygasnąć",
+          unexpected_error: "Wystąpił nieoczekiwany błąd podczas weryfikacji",
+        };
+        return errorMessages[urlError] || "Wystąpił błąd podczas weryfikacji";
+      }
+    }
+    return null;
+  });
 
   const {
     register,
