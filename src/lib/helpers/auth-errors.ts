@@ -43,6 +43,16 @@ export function mapAuthErrorToPolish(error: string | undefined): string {
     return "Sesja wygasła. Zaloguj się ponownie";
   }
 
+  // Password recovery errors
+  if (errorLower.includes("email not sent")) {
+    return "Nie udało się wysłać emaila. Spróbuj ponownie później";
+  }
+
+  // Link expiration
+  if (errorLower.includes("token") && errorLower.includes("expired")) {
+    return "Link resetujący hasło wygasł. Poproś o nowy link";
+  }
+
   // Network errors
   if (errorLower.includes("network") || errorLower.includes("fetch")) {
     return "Błąd połączenia. Sprawdź połączenie z internetem";

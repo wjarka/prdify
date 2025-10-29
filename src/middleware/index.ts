@@ -53,7 +53,8 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
   const isAuthPage = url.pathname.startsWith("/auth/");
 
   // Redirect logged-in users away from auth pages (but not from API endpoints)
-  if (user && isAuthPage && url.pathname !== "/auth/callback") {
+  // Exception: /auth/update-password requires an active session (user comes from email link)
+  if (user && isAuthPage && url.pathname !== "/auth/callback" && url.pathname !== "/auth/update-password") {
     return redirect("/");
   }
 

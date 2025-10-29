@@ -56,7 +56,13 @@ export const PasswordRecoveryForm: FC = () => {
           <AlertDescription>
             <div className="space-y-2">
               <p className="font-medium">Link został wysłany!</p>
-              <p>Sprawdź swoją skrzynkę e-mail. Jeśli konto istnieje, otrzymasz link do resetowania hasła.</p>
+              <p>
+                Sprawdź swoją skrzynkę e-mail. Jeśli konto o podanym adresie istnieje, otrzymasz wiadomość z linkiem
+                do resetowania hasła.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Link będzie ważny przez ograniczony czas. Jeśli nie otrzymasz wiadomości, sprawdź folder ze spamem.
+              </p>
             </div>
           </AlertDescription>
         </Alert>
