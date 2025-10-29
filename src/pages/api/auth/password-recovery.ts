@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { PasswordRecoverySchema } from "@/lib/validation/auth";
-import { mapAuthErrorToPolish } from "@/lib/helpers/auth-errors";
 
 export const prerender = false;
 
@@ -84,4 +83,3 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
     );
   }
 };
-
