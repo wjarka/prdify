@@ -23,3 +23,8 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 supabase/migrations/20251013140000_disable_rls_policies.sql
+
+# testing
+/test-results/
+/playwright-report/
+/coverage/

@@ -18,3 +18,8 @@ AI - Komunikacja z modelami przez usługę Openrouter.ai:
 CI/CD i Hosting:
 - Github Actions do tworzenia pipeline’ów CI/CD
 - Proxmoc LXC Container do hostowania aplikacji za pośrednictwem obrazu docker
+
+Testowanie:
+- Vitest do testów jednostkowych i integracyjnych
+- React Testing Library do testowania komponentów React
+- Playwright do testów E2E

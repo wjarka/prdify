@@ -28,6 +28,7 @@ The project uses a modern tech stack to deliver a fast and interactive user expe
 | Backend   | [Supabase](https://supabase.com/) (PostgreSQL, Authentication, BaaS)                                        |
 | AI        | [OpenRouter.ai](https://openrouter.ai/) (Access to various LLMs like OpenAI, Anthropic, Google)             |
 | DevOps    | [GitHub Actions](https://github.com/features/actions) (CI/CD), [Docker](https://www.docker.com/) for hosting |
+| Testing   | [Vitest](https://vitest.dev/) (Unit/Integration), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) (Components), [Playwright](https://playwright.dev/) (E2E) |
 
 ## 🚀 Getting Started Locally
 
