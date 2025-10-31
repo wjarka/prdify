@@ -16,6 +16,7 @@ alwaysApply: false
 - Explore UI mode for complex test suites - Use `vitest --ui` to visually navigate large test suites, inspect test results, and debug failures more efficiently during development.
 - Handle optional dependencies with smart mocking - Use conditional mocking to test code with optional dependencies by implementing `vi.mock()` with the factory pattern for modules that might not be available in all environments.
 - Configure jsdom for DOM testing - Set `environment: 'jsdom'` in your configuration for frontend component tests and combine with testing-library utilities for realistic user interaction simulation.
+- Handle React act warnings properly - When testing hooks or components that trigger async operations on mount, make the test async, check initial state synchronously, then use `waitFor()` at the end to wait for async operations to complete. This pattern prevents act warnings: `it("should return initial state correctly", async () => { const { result } = renderHook(() => useHook()); expect(result.current.isLoading).toBe(true); await waitFor(() => { expect(result.current.isLoading).toBe(false); }); });`
 - Structure tests for maintainability - Group related tests with descriptive `describe` blocks, use explicit assertion messages, and follow the Arrange-Act-Assert pattern to make tests self-documenting.
 - Leverage TypeScript type checking in tests - Enable strict typing in your tests to catch type errors early, use `expectTypeOf()` for type-level assertions, and ensure mocks preserve the original type signatures.
 
