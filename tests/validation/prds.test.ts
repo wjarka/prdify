@@ -51,11 +51,65 @@ describe("createPrdSchema", () => {
       { ...validData, mainProblem: "a".repeat(5001) },
       "Główny problem może mieć maksymalnie 5000 znaków",
     ],
+    ["inScope", { ...validData, inScope: "a".repeat(5001) }, "Zakres może mieć maksymalnie 5000 znaków"],
+    ["outOfScope", { ...validData, outOfScope: "a".repeat(5001) }, "Poza zakresem może mieć maksymalnie 5000 znaków"],
+    [
+      "successCriteria",
+      { ...validData, successCriteria: "a".repeat(2001) },
+      "Kryteria sukcesu mogą mieć maksymalnie 2000 znaków",
+    ],
   ])("should return an error if field '%s' exceeds max length", (field, data, expectedError) => {
     const result = createPrdSchema.safeParse(data);
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0].message).toBe(expectedError);
+    }
+  });
+
+  it.each([
+    ["name", { ...validData, name: "a".repeat(200) }],
+    ["mainProblem", { ...validData, mainProblem: "a".repeat(5000) }],
+    ["inScope", { ...validData, inScope: "a".repeat(5000) }],
+    ["outOfScope", { ...validData, outOfScope: "a".repeat(5000) }],
+    ["successCriteria", { ...validData, successCriteria: "a".repeat(2000) }],
+  ])("should validate successfully when field '%s' is exactly at max length", (_, data) => {
+    const result = createPrdSchema.safeParse(data);
+    expect(result.success).toBe(true);
+  });
+
+  it.each([
+    ["name", { ...validData, name: null }, "Nazwa musi być tekstem"],
+    ["mainProblem", { ...validData, mainProblem: null }, "Główny problem musi być tekstem"],
+    ["inScope", { ...validData, inScope: null }, "Zakres musi być tekstem"],
+    ["outOfScope", { ...validData, outOfScope: null }, "Poza zakresem musi być tekstem"],
+    ["successCriteria", { ...validData, successCriteria: null }, "Kryteria sukcesu muszą być tekstem"],
+  ])("should return invalid_type_error when field '%s' is null", (_, data, expectedError) => {
+    const result = createPrdSchema.safeParse(data);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(expectedError);
+    }
+  });
+
+  it.each([
+    ["name", { ...validData, name: undefined }, "Nazwa jest wymagana"],
+    ["mainProblem", { ...validData, mainProblem: undefined }, "Główny problem jest wymagany"],
+    ["inScope", { ...validData, inScope: undefined }, "Zakres jest wymagany"],
+    ["outOfScope", { ...validData, outOfScope: undefined }, "Poza zakresem jest wymagane"],
+    ["successCriteria", { ...validData, successCriteria: undefined }, "Kryteria sukcesu są wymagane"],
+  ])("should return required_error when field '%s' is undefined", (_, data, expectedError) => {
+    const result = createPrdSchema.safeParse(data);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(expectedError);
+    }
+  });
+
+  it("should return errors for all missing required fields", () => {
+    const result = createPrdSchema.safeParse({});
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toHaveLength(5);
     }
   });
 
@@ -114,6 +168,42 @@ describe("getPrdsSchema", () => {
     const result = getPrdsSchema.safeParse(query);
     expect(result.success).toBe(false);
   });
+
+  it.each([
+    ["page", { page: "2.5" }],
+    ["limit", { limit: "3.7" }],
+    ["page", { page: 2.5 }],
+    ["limit", { limit: 3.7 }],
+  ])("should return an error for float value for '%s'", (_, query) => {
+    const result = getPrdsSchema.safeParse(query);
+    expect(result.success).toBe(false);
+  });
+
+  it.each([
+    ["page", { page: "-1" }],
+    ["limit", { limit: "-5" }],
+    ["page", { page: "0" }],
+  ])("should return an error for non-positive string value for '%s'", (_, query) => {
+    const result = getPrdsSchema.safeParse(query);
+    expect(result.success).toBe(false);
+  });
+
+  it.each([
+    ["page", { page: "" }],
+    ["limit", { limit: "" }],
+  ])("should return an error for empty string value for '%s'", (_, query) => {
+    const result = getPrdsSchema.safeParse(query);
+    expect(result.success).toBe(false);
+  });
+
+  it("should validate boundary values correctly", () => {
+    const result = getPrdsSchema.safeParse({ page: 1, limit: 100 });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.page).toBe(1);
+      expect(result.data.limit).toBe(100);
+    }
+  });
 });
 
 describe("prdIdSchema", () => {
@@ -130,6 +220,30 @@ describe("prdIdSchema", () => {
     if (!result.success) {
       expect(result.error.issues[0].message).toBe("Nieprawidłowy format ID dokumentu PRD");
     }
+  });
+
+  it("should return an error when id is null", () => {
+    const result = prdIdSchema.safeParse({ id: null });
+    expect(result.success).toBe(false);
+  });
+
+  it("should return an error when id is undefined", () => {
+    const result = prdIdSchema.safeParse({ id: undefined });
+    expect(result.success).toBe(false);
+  });
+
+  it("should return an error when id is an empty string", () => {
+    const result = prdIdSchema.safeParse({ id: "" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("Nieprawidłowy format ID dokumentu PRD");
+    }
+  });
+
+  it("should validate uppercase UUID", () => {
+    const valid = { id: "A1B2C3D4-E5F6-7890-1234-567890ABCDEF" };
+    const result = prdIdSchema.safeParse(valid);
+    expect(result.success).toBe(true);
   });
 });
 
