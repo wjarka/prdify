@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { PRDWorkspace } from "../../components/prd/PRDWorkspace";
+import { PRDWorkspaceView } from "../../components/views/PRDWorkspaceView";
 
 export const prerender = false;
 
@@ -25,5 +25,5 @@ if (error || !prd) {
 ---
 
 <Layout title={prd.name}>
-  <PRDWorkspace prdId={id} client:load />
+  <PRDWorkspaceView prdId={id} client:load />
 </Layout>

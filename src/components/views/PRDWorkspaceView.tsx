@@ -1,19 +1,19 @@
 import type { FC } from "react";
 import { usePRDWorkspace } from "../hooks/usePRDWorkspace";
-import { PRDHeader } from "./PRDHeader";
-import { PlanningStep } from "./PlanningStep";
-import { SummaryStep } from "./SummaryStep";
-import { DocumentStep } from "./DocumentStep";
-import { CompleteStep } from "./CompleteStep";
+import { PRDHeader } from "../prd/PRDHeader";
+import { PlanningStep } from "../prd/PlanningStep";
+import { SummaryStep } from "../prd/SummaryStep";
+import { DocumentStep } from "../prd/DocumentStep";
+import { CompleteStep } from "../prd/CompleteStep";
 import { Spinner } from "../ui/spinner";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 
-interface PRDWorkspaceProps {
+interface PRDWorkspaceViewProps {
   prdId: string;
 }
 
-export const PRDWorkspace: FC<PRDWorkspaceProps> = ({ prdId }) => {
+export const PRDWorkspaceView: FC<PRDWorkspaceViewProps> = ({ prdId }) => {
   const {
     prd,
     questions,
@@ -126,4 +126,4 @@ export const PRDWorkspace: FC<PRDWorkspaceProps> = ({ prdId }) => {
   );
 };
 
-export default PRDWorkspace;
+export default PRDWorkspaceView;
