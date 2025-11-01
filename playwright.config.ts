@@ -4,7 +4,7 @@ import path from "path";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
 export default defineConfig({
-  testDir: "./tests-e2e",
+  testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

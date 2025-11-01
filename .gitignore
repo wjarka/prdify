@@ -29,3 +29,8 @@ supabase/migrations/20251013140000_disable_rls_policies.sql
 /test-results/
 /playwright-report/
 /coverage/
+
+# Playwright
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
