@@ -64,27 +64,41 @@ export const LoginForm: FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" data-testid="login-form">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" data-testid="login-error-alert">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       <div className="space-y-2">
         <Label htmlFor="email">Adres e-mail</Label>
-        <Input id="email" type="email" placeholder="twoj@email.pl" disabled={isSubmitting} {...register("email")} />
+        <Input
+          id="email"
+          type="email"
+          placeholder="twoj@email.pl"
+          disabled={isSubmitting}
+          {...register("email")}
+          data-testid="login-email-input"
+        />
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="password">Hasło</Label>
-        <Input id="password" type="password" placeholder="••••••••" disabled={isSubmitting} {...register("password")} />
+        <Input
+          id="password"
+          type="password"
+          placeholder="••••••••"
+          disabled={isSubmitting}
+          {...register("password")}
+          data-testid="login-password-input"
+        />
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
       </div>
 
       <div className="flex flex-col gap-4">
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button type="submit" disabled={isSubmitting} className="w-full" data-testid="login-submit-button">
           {isSubmitting ? (
             <>
               <Spinner size="sm" />
@@ -96,12 +110,20 @@ export const LoginForm: FC = () => {
         </Button>
 
         <div className="text-center text-sm space-y-2">
-          <a href="/auth/password-recovery" className="text-muted-foreground hover:text-primary transition-colors">
+          <a
+            href="/auth/password-recovery"
+            className="text-muted-foreground hover:text-primary transition-colors"
+            data-testid="login-password-recovery-link"
+          >
             Zapomniałeś hasła?
           </a>
           <p className="text-muted-foreground">
             Nie masz konta?{" "}
-            <a href="/auth/register" className="text-primary hover:underline font-medium">
+            <a
+              href="/auth/register"
+              className="text-primary hover:underline font-medium"
+              data-testid="login-register-link"
+            >
               Zarejestruj się
             </a>
           </p>
