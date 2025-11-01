@@ -22,7 +22,7 @@ export function CreatePrdForm({ onSubmit, isSubmitting }: CreatePrdFormProps) {
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" data-testid="create-prd-form">
       <div className="space-y-2">
         <Label htmlFor="name">Nazwa projektu</Label>
         <Input
@@ -30,6 +30,7 @@ export function CreatePrdForm({ onSubmit, isSubmitting }: CreatePrdFormProps) {
           {...register("name")}
           placeholder="np. System zarządzania użytkownikami"
           disabled={isSubmitting}
+          data-testid="create-prd-name-input"
         />
         {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
       </div>
@@ -42,6 +43,7 @@ export function CreatePrdForm({ onSubmit, isSubmitting }: CreatePrdFormProps) {
           placeholder="Opisz główny problem, który rozwiązuje ten projekt..."
           rows={3}
           disabled={isSubmitting}
+          data-testid="create-prd-main-problem-textarea"
         />
         {errors.mainProblem && <p className="text-sm text-destructive">{errors.mainProblem.message}</p>}
       </div>
@@ -54,6 +56,7 @@ export function CreatePrdForm({ onSubmit, isSubmitting }: CreatePrdFormProps) {
           placeholder="Co jest w zakresie tego projektu..."
           rows={3}
           disabled={isSubmitting}
+          data-testid="create-prd-in-scope-textarea"
         />
         {errors.inScope && <p className="text-sm text-destructive">{errors.inScope.message}</p>}
       </div>
@@ -66,6 +69,7 @@ export function CreatePrdForm({ onSubmit, isSubmitting }: CreatePrdFormProps) {
           placeholder="Co jest poza zakresem tego projektu..."
           rows={3}
           disabled={isSubmitting}
+          data-testid="create-prd-out-of-scope-textarea"
         />
         {errors.outOfScope && <p className="text-sm text-destructive">{errors.outOfScope.message}</p>}
       </div>
@@ -78,12 +82,13 @@ export function CreatePrdForm({ onSubmit, isSubmitting }: CreatePrdFormProps) {
           placeholder="Jakie są kryteria sukcesu tego projektu..."
           rows={3}
           disabled={isSubmitting}
+          data-testid="create-prd-success-criteria-textarea"
         />
         {errors.successCriteria && <p className="text-sm text-destructive">{errors.successCriteria.message}</p>}
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} data-testid="create-prd-submit-button">
           {isSubmitting ? "Tworzenie..." : "Utwórz PRD"}
         </Button>
       </div>

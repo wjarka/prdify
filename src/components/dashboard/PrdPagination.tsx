@@ -50,12 +50,18 @@ export function PrdPagination({ pagination, onPageChange }: PrdPaginationProps) 
   }
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
-      <Button variant="outline" size="sm" onClick={() => onPageChange(page - 1)} disabled={page === 1}>
+    <div className="flex items-center justify-center gap-2 mt-8" data-testid="prd-pagination">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(page - 1)}
+        disabled={page === 1}
+        data-testid="pagination-previous-button"
+      >
         Poprzednia
       </Button>
 
-      <div className="flex gap-1">
+      <div className="flex gap-1" data-testid="pagination-pages">
         {pages.map((p, idx) => {
           if (p === "...") {
             return (
@@ -72,6 +78,7 @@ export function PrdPagination({ pagination, onPageChange }: PrdPaginationProps) 
               variant={pageNum === page ? "default" : "outline"}
               size="sm"
               onClick={() => onPageChange(pageNum)}
+              data-testid={`pagination-page-button-${pageNum}`}
             >
               {pageNum}
             </Button>
@@ -79,7 +86,13 @@ export function PrdPagination({ pagination, onPageChange }: PrdPaginationProps) 
         })}
       </div>
 
-      <Button variant="outline" size="sm" onClick={() => onPageChange(page + 1)} disabled={page === totalPages}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(page + 1)}
+        disabled={page === totalPages}
+        data-testid="pagination-next-button"
+      >
         Następna
       </Button>
     </div>

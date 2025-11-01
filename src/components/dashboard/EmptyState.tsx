@@ -6,7 +6,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ onCreateNew }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center" data-testid="prd-empty-state">
       <div className="max-w-md">
         <svg
           className="mx-auto h-12 w-12 text-muted-foreground"
@@ -27,7 +27,9 @@ export function EmptyState({ onCreateNew }: EmptyStateProps) {
           Rozpocznij pracę, tworząc swój pierwszy dokument wymagań produktowych.
         </p>
         <div className="mt-6">
-          <Button onClick={onCreateNew}>Utwórz nowy PRD</Button>
+          <Button onClick={onCreateNew} data-testid="empty-state-create-button">
+            Utwórz nowy PRD
+          </Button>
         </div>
       </div>
     </div>

@@ -14,7 +14,13 @@ export function PrdActionsMenu({ onDelete }: PrdActionsMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={(e) => e.stopPropagation()}
+          data-testid="prd-actions-menu-trigger"
+        >
           <span className="sr-only">Otwórz menu</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -39,6 +45,7 @@ export function PrdActionsMenu({ onDelete }: PrdActionsMenuProps) {
             onDelete();
           }}
           className="text-destructive focus:text-destructive"
+          data-testid="prd-actions-menu-delete"
         >
           Usuń
         </DropdownMenuItem>

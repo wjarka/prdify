@@ -28,11 +28,14 @@ export function PrdCard({ prd, onDelete }: PrdCardProps) {
       tabIndex={0}
       role="button"
       aria-label={`Otwórz dokument ${prd.name}`}
+      data-testid={`prd-card-${prd.id}`}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg truncate">{prd.name}</CardTitle>
+            <CardTitle className="text-lg truncate" data-testid={`prd-card-title-${prd.id}`}>
+              {prd.name}
+            </CardTitle>
             <div className="mt-2 flex items-center gap-2">
               <PrdStatusBadge status={prd.status} />
               <span className="text-xs text-muted-foreground">
@@ -40,7 +43,12 @@ export function PrdCard({ prd, onDelete }: PrdCardProps) {
               </span>
             </div>
           </div>
-          <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="none">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            role="none"
+            data-testid={`prd-card-actions-${prd.id}`}
+          >
             <PrdActionsMenu onDelete={() => onDelete(prd.id, prd.name)} />
           </div>
         </div>

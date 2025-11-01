@@ -30,7 +30,7 @@ export function DeleteConfirmationDialog({ isOpen, prdName, onConfirm, onCancel 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent>
+      <DialogContent data-testid="delete-prd-confirmation-dialog">
         <DialogHeader>
           <DialogTitle>Potwierdzenie usunięcia</DialogTitle>
           <DialogDescription>
@@ -38,10 +38,15 @@ export function DeleteConfirmationDialog({ isOpen, prdName, onConfirm, onCancel 
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel} disabled={isDeleting}>
+          <Button variant="outline" onClick={onCancel} disabled={isDeleting} data-testid="delete-prd-cancel-button">
             Anuluj
           </Button>
-          <Button variant="destructive" onClick={handleConfirm} disabled={isDeleting}>
+          <Button
+            variant="destructive"
+            onClick={handleConfirm}
+            disabled={isDeleting}
+            data-testid="delete-prd-confirm-button"
+          >
             {isDeleting ? "Usuwanie..." : "Usuń"}
           </Button>
         </DialogFooter>

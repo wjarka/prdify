@@ -45,9 +45,11 @@ export function CreatePrdDialog({ onSubmit, open, onOpenChange }: CreatePrdDialo
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button size="lg">Utwórz nowy PRD</Button>
+        <Button size="lg" data-testid="create-prd-button">
+          Utwórz nowy PRD
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="create-prd-dialog">
         <DialogHeader>
           <DialogTitle>Utwórz nowy dokument PRD</DialogTitle>
           <DialogDescription>
