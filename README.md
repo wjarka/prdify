@@ -60,8 +60,8 @@ To run the project on your local machine, follow these steps.
     ```
     Then, fill in your Supabase project URL and Anon Key in the `.env` file:
     ```
-    PUBLIC_SUPABASE_URL="your-supabase-project-url"
-    PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+    SUPABASE_URL="your-supabase-project-url"
+    SUPABASE_KEY="your-supabase-anon-key"
     ```
 
 4.  **Run the development server:**
