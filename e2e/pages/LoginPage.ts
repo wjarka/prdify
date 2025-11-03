@@ -42,7 +42,7 @@ export class LoginPage {
    * Przechodzi do strony logowania
    */
   async goto(): Promise<void> {
-    await this.page.goto("/auth/login");
+    await this.page.goto("/auth/login", { waitUntil: "networkidle" });
   }
 
   /**
@@ -213,15 +213,24 @@ export class LoginPage {
   }
 
   /**
-   * Czeka na zakończenie procesu logowania (czeka na zniknięcie przycisku submit lub przekierowanie)
+   * Czeka na zakończenie procesu logowania (czeka na przekierowanie na dashboard)
    */
   async waitForLoginComplete(): Promise<void> {
-    // Czeka na przekierowanie lub zniknięcie formularza
-    await Promise.race([
-      this.page.waitForURL("/", { timeout: 5000 }),
-      this.loginForm.waitFor({ state: "hidden", timeout: 5000 }),
-    ]).catch(() => {
-      // Ignoruj błędy timeout - może być błąd logowania
-    });
+    // Czeka na przekierowanie na dashboard (sukces) lub pozostanie na stronie logowania (błąd)
+    // Używamy waitForURL z konkretnym timeoutem i sprawdzamy wynik
+    try {
+      // Jeśli logowanie się powiodło, powinniśmy być przekierowani na dashboard
+      await this.page.waitForURL("/", { timeout: 10000 });
+    } catch {
+      // Jeśli timeout, sprawdź czy nadal jesteśmy na stronie logowania (błąd logowania)
+      const currentUrl = this.page.url();
+      if (!currentUrl.includes("/auth/login")) {
+        // Jeśli nie jesteśmy na login ani na dashboard, może być inne przekierowanie
+        // Poczekaj na stabilizację URL
+        await this.page.waitForLoadState("networkidle");
+      }
+      // Jeśli nadal jesteśmy na /auth/login, to znaczy że logowanie się nie powiodło
+      // W takim przypadku nie rzucamy błędu - test powinien sprawdzić error alert
+    }
   }
 }

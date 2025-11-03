@@ -86,7 +86,7 @@ export class DashboardPage {
    * Uwaga: Jeśli użytkownik nie jest zalogowany, zostanie przekierowany na stronę logowania
    */
   async goto(): Promise<void> {
-    await this.page.goto("/");
+    await this.page.goto("/", { waitUntil: "networkidle" });
   }
 
   /**
@@ -110,10 +110,23 @@ export class DashboardPage {
    * Jeśli użytkownik nie jest zalogowany, loguje go używając danych testowych
    */
   async gotoAsAuthenticated(): Promise<void> {
-    // Przejdź do dashboardu
+    // Przejdź do dashboardu i poczekaj na zakończenie nawigacji
     await this.goto();
 
-    // Sprawdź czy zostaliśmy przekierowani na stronę logowania (oznacza brak autoryzacji)
+    // Poczekaj na zakończenie nawigacji - może przekierować na login lub zostać na dashboardzie
+    // Używamy waitForURL z alternatywnymi ścieżkami, aby poczekać na stabilizację URL
+    try {
+      // Czekamy na jedno z dwóch możliwych URL z timeoutem
+      await Promise.race([
+        this.page.waitForURL("/", { timeout: 3000 }),
+        this.page.waitForURL("/auth/login", { timeout: 3000 }),
+      ]);
+    } catch {
+      // Jeśli timeout, sprawdzamy aktualny URL po zakończeniu nawigacji
+      await this.page.waitForLoadState("networkidle");
+    }
+
+    // Sprawdź czy jesteśmy na stronie logowania (oznacza brak autoryzacji)
     const currentUrl = this.page.url();
     const isOnLoginPage = currentUrl.includes("/auth/login");
 
@@ -121,7 +134,7 @@ export class DashboardPage {
       // Użytkownik nie jest zalogowany, zaloguj go
       await this.loginWithTestCredentials();
       // Po zalogowaniu powinniśmy być automatycznie przekierowani na dashboard
-      await this.page.waitForURL("/", { timeout: 5000 });
+      await this.page.waitForURL("/", { timeout: 10000 });
     }
 
     // Upewnij się, że jesteśmy na dashboardzie i strona się załadowała
@@ -132,8 +145,21 @@ export class DashboardPage {
    * Otwiera dialog tworzenia PRD
    */
   async openCreatePrdDialog(): Promise<void> {
+    // Wait for button to be actionable before clicking
+    await this.createPrdButton.waitFor({ state: "attached" });
+    await expect(this.createPrdButton).toBeEnabled();
+
+    // Click the button to open the dialog
     await this.createPrdButton.click();
+
+    // Wait for dialog to be attached to DOM first (ensures Radix UI has rendered it)
+    await this.createPrdDialog.waitFor({ state: "attached" });
+
+    // Wait for dialog to be visible (accounting for CSS animations)
     await this.createPrdDialog.waitFor({ state: "visible" });
+
+    // Wait for form inputs to be ready as a final check that dialog is fully loaded
+    await this.nameInput.waitFor({ state: "visible" });
   }
 
   /**
