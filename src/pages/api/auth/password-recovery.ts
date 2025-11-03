@@ -51,6 +51,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
 
     // Log other errors but don't expose them to prevent email enumeration
     if (error) {
+      // eslint-disable-next-line no-console
       console.error("Password recovery error:", error);
     }
 
@@ -69,6 +70,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
       }
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Unexpected error during password recovery:", error);
     return new Response(
       JSON.stringify({
