@@ -1,0 +1,7 @@
+name = "prdify"
+compatibility_flags = [ "nodejs_compat", "disable_nodejs_process_v2" ]
+compatibility_date = "2025-10-14"
+[assets]
+directory = "./dist"
+[vars]
+OPENROUTER_DEFAULT_MODEL = "google/gemini-2.5-pro"
