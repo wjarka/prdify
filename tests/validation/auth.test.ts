@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  LoginSchema,
-  RegisterSchema,
-  PasswordRecoverySchema,
-  UpdatePasswordSchema,
-} from "@/lib/validation/auth";
+import { LoginSchema, RegisterSchema, PasswordRecoverySchema, UpdatePasswordSchema } from "@/lib/validation/auth";
 
 describe("LoginSchema", () => {
   const validData = {
@@ -243,9 +238,7 @@ describe("UpdatePasswordSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      const confirmPasswordError = result.error.issues.find(
-        (issue) => issue.path[0] === "confirmPassword",
-      );
+      const confirmPasswordError = result.error.issues.find((issue) => issue.path[0] === "confirmPassword");
       expect(confirmPasswordError?.message).toBe("Hasła muszą być identyczne");
     }
   });
@@ -328,11 +321,8 @@ describe("UpdatePasswordSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       // Should have error about password length, not mismatch
-      const lengthError = result.error.issues.find(
-        (issue) => issue.message === "Hasło musi mieć co najmniej 6 znaków",
-      );
+      const lengthError = result.error.issues.find((issue) => issue.message === "Hasło musi mieć co najmniej 6 znaków");
       expect(lengthError).toBeDefined();
     }
   });
 });
-

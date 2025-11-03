@@ -15,6 +15,7 @@ export const GET: APIRoute = async ({ url, locals, redirect }) => {
     const { error } = await locals.supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
+      // eslint-disable-next-line no-console
       console.error("Error exchanging code for session:", error);
       return redirect("/auth/login?error=invalid_code");
     }
@@ -22,6 +23,7 @@ export const GET: APIRoute = async ({ url, locals, redirect }) => {
     // Successful authentication - redirect to the next page
     return redirect(next);
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error("Unexpected error during callback:", err);
     return redirect("/auth/login?error=unexpected_error");
   }
