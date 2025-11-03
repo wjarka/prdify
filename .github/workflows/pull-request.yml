@@ -90,13 +90,6 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-      - name: Upload E2E coverage
-        uses: actions/upload-artifact@v5
-        if: always()
-        with:
-          name: e2e-coverage
-          path: coverage/
-          retention-days: 30
 
   status-comment:
     name: Post Status Comment
