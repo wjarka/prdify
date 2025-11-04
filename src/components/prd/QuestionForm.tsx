@@ -1,4 +1,4 @@
-import { useState, useCallback, type FC } from "react";
+import { useState, useCallback, Fragment, type FC } from "react";
 import type { PrdQuestionDto, PrdQuestionAnswer } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Textarea } from "../ui/textarea";
@@ -60,8 +60,16 @@ export const QuestionForm: FC<QuestionFormProps> = ({ questions, roundNumber, is
         >
           {questions.map((question, index) => (
             <div key={question.id} className="space-y-2">
-              <Label htmlFor={`question-${question.id}`}>
-                Pytanie {index + 1}:<span className="font-normal text-muted-foreground ml-2">{question.question}</span>
+              <Label htmlFor={`question-${question.id}`} className="select-text">
+                <span className="font-normal ml-2">
+                  <span className="block font-semibold mb-1">Pytanie {index + 1}:</span>
+                  {question.question.split("\n").map((line, i) => (
+                    <Fragment key={i}>
+                      {line}
+                      {i < question.question.split("\n").length - 1 && <br />}
+                    </Fragment>
+                  ))}
+                </span>
               </Label>
               <Textarea
                 id={`question-${question.id}`}
@@ -70,7 +78,7 @@ export const QuestionForm: FC<QuestionFormProps> = ({ questions, roundNumber, is
                 placeholder="Wpisz swoją odpowiedź..."
                 rows={4}
                 disabled={isSubmitting}
-                className="resize-y"
+                className="resize-y mt-5"
               />
             </div>
           ))}
