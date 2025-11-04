@@ -70,7 +70,7 @@ export async function getCurrentRoundNumber(supabase: SupabaseClient, prdId: str
     throw new RoundNumberCalculationError(error.message);
   }
 
-  return data?.round_number ?? 0;
+  return data?.round_number ?? 1;
 }
 
 async function mapPrdRowToDto(supabase: SupabaseClient, row: Prd): Promise<PrdDto> {
