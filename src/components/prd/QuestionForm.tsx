@@ -61,8 +61,8 @@ export const QuestionForm: FC<QuestionFormProps> = ({ questions, roundNumber, is
           {questions.map((question, index) => (
             <div key={question.id} className="space-y-2">
               <Label htmlFor={`question-${question.id}`} className="select-text">
-                <span className="font-normal ml-2">
-                  <span className="block font-semibold mb-1">Pytanie {index + 1}:</span>
+                Pytanie&nbsp;{index + 1}:
+                <span className="font-normal ml-2 block">
                   {question.question.split("\n").map((line, i) => (
                     <Fragment key={i}>
                       {line}
