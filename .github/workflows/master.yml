@@ -42,10 +42,19 @@ jobs:
         run: npm run test
 
 
-  build:
-    name: Build Application
+  build-and-deploy:
+    name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     needs: [lint, unit-test]
+    environment: production
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      OPENROUTER_DEFAULT_MODEL: ${{ vars.OPENROUTER_DEFAULT_MODEL }}
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -62,33 +71,12 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: build-output
-          path: dist/
-          retention-days: 1
-
-  deploy:
-    name: Deploy to Cloudflare Pages
-    runs-on: ubuntu-latest
-    needs: build
-    environment: production
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: build-output
-          path: dist
-
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          wranglerVersion: 4.45.3
 
           
